@@ -324,9 +324,22 @@
                             try {
                                 const json = await resp.json();
                                 if (json && json.success) {
-                                    showMessage('Registration successful. Redirecting...', 'success');
-                                    // After registration, take the user to the dashboard (app allows guest access)
-                                    setTimeout(() => window.location.href = 'dashboard.html', 900);
+                                    // Inform user that registration succeeded and return them to the login form
+                                    showMessage('Registration successful. Please sign in with your new credentials.', 'success');
+                                    // Switch back to the login form and prefill the email field so user can log in
+                                    showLogin();
+                                    try {
+                                        const loginEmail = document.getElementById('email');
+                                        const regEmail = document.getElementById('regEmail');
+                                        const regPassword = document.getElementById('regPassword');
+                                        if (loginEmail && regEmail) loginEmail.value = regEmail.value;
+                                        if (regPassword) regPassword.value = '';
+                                        // focus the password field on the login form for convenience
+                                        const loginPassword = document.getElementById('password');
+                                        if (loginPassword) loginPassword.focus();
+                                    } catch (err) {
+                                        // ignore DOM errors
+                                    }
                                     return;
                                 }
                             } catch (err) {
