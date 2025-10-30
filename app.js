@@ -56,7 +56,6 @@ const wishlistSection = document.getElementById('wishlistSection');
 
 // Header tab buttons
 const tabHome = document.getElementById('tabHome');
-const tabBudgetTab = document.getElementById('tabBudget');
 const tabWishlist = document.getElementById('tabWishlist');
 
 // Wishlist state for the current logged-in user
@@ -218,7 +217,6 @@ document.addEventListener('DOMContentLoaded', function() {
     closeBudgetModal.addEventListener('click', () => hideBudgetModal());
     // Header tab listeners (if present)
     if (tabHome) tabHome.addEventListener('click', () => { currentView = 'BRAND_SELECT'; renderContent(); });
-    if (tabBudgetTab) tabBudgetTab.addEventListener('click', () => { currentView = 'BUDGET'; renderContent(); showBudgetModal(); });
     if (tabWishlist) tabWishlist.addEventListener('click', () => { currentView = 'WISHLIST'; renderContent(); renderWishlistView(); });
     
     comparisonModal.addEventListener('click', function(e) {
@@ -687,10 +685,6 @@ function renderContent() {
         if (tabHome) {
             tabHome.classList.toggle('active', currentView === 'BRAND_SELECT');
             tabHome.setAttribute('aria-pressed', currentView === 'BRAND_SELECT');
-        }
-        if (tabBudgetTab) {
-            tabBudgetTab.classList.toggle('active', currentView === 'BUDGET');
-            tabBudgetTab.setAttribute('aria-pressed', currentView === 'BUDGET');
         }
         if (tabWishlist) {
             tabWishlist.classList.toggle('active', currentView === 'WISHLIST');

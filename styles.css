@@ -84,6 +84,38 @@ body {
     transition: background-color 0.2s;
 }
 
+/* Top tabs in header (Home, Wishlist) */
+.top-tabs {
+    display: flex;
+    gap: 0.5rem;
+    margin-left: 1rem;
+    align-items: center;
+}
+
+.tab-btn {
+    background: transparent;
+    border: none;
+    padding: 0.45rem 0.75rem;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    color: #374151;
+    font-weight: 600;
+    transition: background-color 0.12s, color 0.12s;
+}
+
+.tab-btn:hover {
+    background: #f3f4f6;
+}
+
+.tab-btn.active {
+    background: #2563eb;
+    color: white;
+}
+
+.tab-btn:focus {
+    outline: 2px solid rgba(37,99,235,0.18);
+}
+
 .compare-btn:hover {
     background: #c2410c;
 }
