@@ -116,6 +116,11 @@ body {
     outline: 2px solid rgba(37,99,235,0.18);
 }
 
+/* Wishlist section spacing (moved from inline style) */
+#wishlistSection {
+    margin-top: 1.5rem;
+}
+
 .compare-btn:hover {
     background: #c2410c;
 }
