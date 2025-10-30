@@ -25,7 +25,10 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // Use MONGODB_URI env var if provided (useful for Atlas). Falls back to local DB.
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/carspecs';
 
-mongoose.connect(MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+// Connect to MongoDB. Options like `useNewUrlParser` and `useUnifiedTopology`
+// are deprecated in recent drivers and are no longer required when using
+// modern mongoose versions — let mongoose pick sensible defaults.
+mongoose.connect(MONGODB_URI)
     .then(() => console.log('MongoDB connected:', MONGODB_URI))
     .catch(err => console.warn('MongoDB connection error (continuing with mock user):', err.message));
 
