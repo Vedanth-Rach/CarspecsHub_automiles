@@ -60,8 +60,14 @@
 						</div>
 					</div>
 				</div>
-                
-					<button id="logoutBtn" class="budget-btn logout-btn">
+
+				<nav class="top-tabs" style="display:flex; gap:0.5rem; margin-left:1rem; align-items:center;">
+					<button id="tabHome" class="tab-btn" aria-pressed="true">Home</button>
+					<button id="tabBudget" class="tab-btn">Budget Finder</button>
+					<button id="tabWishlist" class="tab-btn">Wishlist</button>
+				</nav>
+
+				<button id="logoutBtn" class="budget-btn logout-btn">
 					<i class="fas fa-sign-out-alt"></i>
 					Log Out
 				</button>
@@ -105,6 +111,11 @@
 			
 			<section id="carShowcase" class="car-showcase hidden">
 				<!-- Dynamic content will be inserted here -->
+			</section>
+
+			<!-- WISHLIST SECTION -->
+			<section id="wishlistSection" class="card hidden" style="margin-top:1.5rem;">
+				<!-- Wishlist content will be rendered here by app.js -->
 			</section>
 
 			<div class="content-grid hidden" id="mainContentGrid">

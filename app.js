@@ -52,6 +52,155 @@ const carDropdown = document.getElementById('carDropdown');
 const initialSelection = document.getElementById('initialSelection');
 const mainContentGrid = document.getElementById('mainContentGrid');
 const brandInfoSection = document.querySelector('.brand-info'); // Reference existing brand info section
+const wishlistSection = document.getElementById('wishlistSection');
+
+// Header tab buttons
+const tabHome = document.getElementById('tabHome');
+const tabBudgetTab = document.getElementById('tabBudget');
+const tabWishlist = document.getElementById('tabWishlist');
+
+// Wishlist state for the current logged-in user
+let userWishlist = new Set(); // set of carIds
+
+// Load wishlist from server (if authenticated). Populates userWishlist set.
+function loadWishlist() {
+    fetch('/api/wishlist', { credentials: 'same-origin' })
+        .then(resp => {
+            if (resp.status === 401) {
+                // Not authenticated; ignore silently
+                return null;
+            }
+            if (!resp.ok) throw new Error('Failed to load wishlist');
+            return resp.json();
+        }).then(json => {
+            if (!json || !json.wishlist) return;
+            userWishlist = new Set(json.wishlist);
+            // Update visible buttons to reflect wishlist state
+            updateWishlistButtons();
+        }).catch(err => {
+            // ignore errors (server might be unauthenticated or offline)
+            console.warn('Could not load wishlist', err);
+        });
+}
+
+// Render the user's wishlist by fetching saved car IDs from the server
+function renderWishlistView() {
+    if (!wishlistSection) return;
+    wishlistSection.innerHTML = `<div class="card"><div class="card-header"><h3 class="card-title">Your Wishlist</h3></div><div class="card-body"><p>Loading your wishlist...</p></div></div>`;
+
+    fetch('/api/wishlist', { credentials: 'same-origin' })
+        .then(resp => {
+            if (resp.status === 401) {
+                // Not authenticated
+                wishlistSection.innerHTML = `<div class="card"><div class="card-header"><h3 class="card-title">Your Wishlist</h3></div><div class="card-body"><p>Please sign in to view and manage your wishlist.</p></div></div>`;
+                return null;
+            }
+            if (!resp.ok) throw new Error('Failed to load wishlist');
+            return resp.json();
+        })
+        .then(json => {
+            if (!json) return;
+            const ids = json.wishlist || [];
+            userWishlist = new Set(ids);
+
+            if (ids.length === 0) {
+                wishlistSection.innerHTML = `<div class="card"><div class="card-header"><h3 class="card-title">Your Wishlist</h3></div><div class="card-body"><p>Your wishlist is empty. Browse models and add ones you like.</p></div></div>`;
+                updateWishlistButtons();
+                return;
+            }
+
+            // Map ids to car objects and render
+            const cars = ids.map(id => indianCarsData.find(c => c.id === id)).filter(Boolean);
+            wishlistSection.innerHTML = `
+                <div class="card">
+                    <div class="card-header"><h3 class="card-title">Your Wishlist</h3></div>
+                    <div class="wishlist-list card-body">
+                        ${cars.map(car => `
+                            <div class="wishlist-item" style="display:flex; align-items:center; justify-content:space-between; padding:0.75rem; border-bottom:1px solid #eee;">
+                                <div style="display:flex; gap:0.75rem; align-items:center; cursor:pointer; flex:1;" onclick="selectModel('${car.id}')">
+                                    <img src="${car.variants[0].image}" alt="${car.model}" style="width:72px; height:48px; object-fit:cover; border-radius:4px;">
+                                    <div>
+                                        <div style="font-weight:600;">${car.brand} ${car.model}</div>
+                                        <div style="font-size:0.9rem; color:#6b7280;">${car.bodyType} • ${car.variants.length} variants</div>
+                                    </div>
+                                </div>
+                                <div style="display:flex; gap:0.5rem; align-items:center;">
+                                    <button data-wish-carid="${car.id}" onclick="(function(e){ e.stopPropagation(); toggleWishlist('${car.id}', this); })(event)" class="clear-btn" style="background:#ef4444; color:white; border-radius:6px; padding:0.5rem 0.75rem;">Remove</button>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+
+            // Ensure buttons show the right state
+            updateWishlistButtons();
+        }).catch(err => {
+            console.error('Error loading wishlist view', err);
+            wishlistSection.innerHTML = `<div class="card"><div class="card-header"><h3 class="card-title">Your Wishlist</h3></div><div class="card-body"><p>Could not load wishlist. Try again later.</p></div></div>`;
+        });
+}
+
+function updateWishlistButtons() {
+    // update all buttons with data-wish attribute
+    document.querySelectorAll('[data-wish-carid]').forEach(btn => {
+        const id = btn.getAttribute('data-wish-carid');
+        if (userWishlist.has(id)) {
+            btn.textContent = 'In My Wishlist ✓';
+            btn.classList.add('in-wishlist');
+        } else {
+            btn.textContent = 'Add to my Wishlist';
+            btn.classList.remove('in-wishlist');
+        }
+    });
+}
+
+// Toggle wishlist state for a car. `btn` is the button element (optional)
+function toggleWishlist(carId, btn) {
+    if (!carId) return;
+    const inList = userWishlist.has(carId);
+    if (inList) {
+        // remove
+        fetch(`/api/wishlist/${encodeURIComponent(carId)}`, {
+            method: 'DELETE', credentials: 'same-origin'
+        }).then(r => {
+            if (r.ok) {
+                userWishlist.delete(carId);
+                if (btn) btn.textContent = 'Add to my Wishlist';
+                updateWishlistButtons();
+                showCustomMessage('Removed from your wishlist', 'info');
+            } else if (r.status === 401) {
+                showCustomMessage('Please sign in to manage your wishlist.', 'error');
+            } else {
+                showCustomMessage('Could not remove from wishlist', 'error');
+            }
+        }).catch(err => {
+            console.error(err);
+            showCustomMessage('Error contacting server', 'error');
+        });
+    } else {
+        // add
+        fetch('/api/wishlist', {
+            method: 'POST', credentials: 'same-origin',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({ carId })
+        }).then(r => {
+            if (r.ok) {
+                userWishlist.add(carId);
+                if (btn) btn.textContent = 'In My Wishlist ✓';
+                updateWishlistButtons();
+                showCustomMessage('Added to your wishlist', 'info');
+            } else if (r.status === 401) {
+                showCustomMessage('Please sign in to add to your wishlist.', 'error');
+            } else {
+                showCustomMessage('Could not add to wishlist', 'error');
+            }
+        }).catch(err => {
+            console.error(err);
+            showCustomMessage('Error contacting server', 'error');
+        });
+    }
+}
 
 
 // Initialize the app
@@ -67,6 +216,10 @@ document.addEventListener('DOMContentLoaded', function() {
     closeModal.addEventListener('click', () => hideComparison());
     budgetBtn.addEventListener('click', () => showBudgetModal());
     closeBudgetModal.addEventListener('click', () => hideBudgetModal());
+    // Header tab listeners (if present)
+    if (tabHome) tabHome.addEventListener('click', () => { currentView = 'BRAND_SELECT'; renderContent(); });
+    if (tabBudgetTab) tabBudgetTab.addEventListener('click', () => { currentView = 'BUDGET'; renderContent(); showBudgetModal(); });
+    if (tabWishlist) tabWishlist.addEventListener('click', () => { currentView = 'WISHLIST'; renderContent(); renderWishlistView(); });
     
     comparisonModal.addEventListener('click', function(e) {
         if (e.target === comparisonModal) {
@@ -435,6 +588,7 @@ function renderContent() {
     initialSelection.classList.add('hidden');
     carShowcase.classList.add('hidden');
     mainContentGrid.classList.add('hidden');
+    if (wishlistSection) wishlistSection.classList.add('hidden');
     
     // HIDE THE REDUNDANT COMPARISON BUTTON ALT (FIX)
     if (compareBtnGlobalAlt) {
@@ -516,6 +670,33 @@ function renderContent() {
         // Scroll to top of the showcase
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
+
+    // Handle wishlist view
+    if (currentView === 'WISHLIST') {
+        if (wishlistSection) {
+            wishlistSection.classList.remove('hidden');
+            renderWishlistView();
+        }
+        // Hide other central content when showing wishlist
+        initialSelection.classList.add('hidden');
+        carShowcase.classList.add('hidden');
+        mainContentGrid.classList.add('hidden');
+    }
+    // Update header tab active state (if present)
+    try {
+        if (tabHome) {
+            tabHome.classList.toggle('active', currentView === 'BRAND_SELECT');
+            tabHome.setAttribute('aria-pressed', currentView === 'BRAND_SELECT');
+        }
+        if (tabBudgetTab) {
+            tabBudgetTab.classList.toggle('active', currentView === 'BUDGET');
+            tabBudgetTab.setAttribute('aria-pressed', currentView === 'BUDGET');
+        }
+        if (tabWishlist) {
+            tabWishlist.classList.toggle('active', currentView === 'WISHLIST');
+            tabWishlist.setAttribute('aria-pressed', currentView === 'WISHLIST');
+        }
+    } catch (e) { /* ignore */ }
 }
 
 // --- SELECTORS / RENDERERS ---
@@ -569,12 +750,15 @@ function renderModelList(brand) {
                 const price = (car.variants[0].pricing.exShowroom / 100000).toFixed(2);
                 return `
                     <div class="car-item" onclick="selectModel('${car.id}')" style="display: flex; align-items: center; justify-content: space-between; padding: 1rem; margin-bottom: 1rem;">
-                        <div class="car-info">
+                        <div class="car-info" style="flex:1;">
                             <h4 class="car-name">${car.model}</h4>
                             <p class="car-body-type">${car.bodyType} | ${car.variants.length} Variants</p>
                             <p class="car-price">₹${price} Lakh onwards</p>
                         </div>
-                        <img src="${car.variants[0].image}" alt="${car.model}" class="car-image" style="width: 6rem; height: 4rem;">
+                        <div style="display:flex; flex-direction:column; align-items:flex-end; gap:0.5rem;">
+                            <img src="${car.variants[0].image}" alt="${car.model}" class="car-image" style="width: 6rem; height: 4rem;">
+                            <button data-wish-carid="${car.id}" onclick="(function(e){ e.stopPropagation(); toggleWishlist('${car.id}', this); })(event)" class="clear-btn" style="margin-top:0.5rem;">Add to my Wishlist</button>
+                        </div>
                     </div>
                 `;
             }).join('')}
@@ -664,6 +848,10 @@ function renderCarShowcase() {
                     <button onclick="goToBrandSelect()" 
                             style="padding: 0.75rem 1.5rem; background: #2563eb; color: white; border: none; border-radius: 0.5rem; cursor: pointer; font-weight: 500; display: flex; align-items: center; gap: 0.5rem;">
                         <i class="fas fa-car-side"></i> Go to Brands
+                    </button>
+                    <button data-wish-carid="${selectedCar.id}" onclick="(function(e){ e.stopPropagation(); toggleWishlist('${selectedCar.id}', this); })(event)" 
+                            style="padding: 0.5rem 1rem; background: #10b981; color: white; border: none; border-radius: 0.5rem; cursor: pointer; font-weight: 600; display: flex; align-items: center; gap: 0.5rem;">
+                        <i class="fas fa-heart"></i> Add to my Wishlist
                     </button>
                 </div>
                 <!-- END NEW -->
