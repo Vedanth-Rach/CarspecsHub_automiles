@@ -1604,3 +1604,102 @@ body {
     color: #1d4ed8;
     text-decoration: underline;
 }
+
+/* New hero + glass card styles to match design */
+.hero {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(ellipse at center, #e6eefb 0%, #f3f6fb 40%, #ffffff 100%);
+    position: relative;
+    overflow: hidden;
+}
+
+.auth-wrapper {
+    position: relative;
+    width: 100%;
+    max-width: 420px;
+    padding: 2rem 1rem;
+}
+
+.auth-card {
+    position: relative;
+    background: rgba(255,255,255,0.72);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+    border-radius: 16px;
+    box-shadow: 0 20px 40px rgba(16,24,40,0.12);
+    padding: 2.25rem 2rem 2.5rem 2rem;
+    border: 1px solid rgba(255,255,255,0.6);
+}
+
+.logo-pill {
+    position: absolute;
+    left: 50%;
+    top: -34px;
+    transform: translateX(-50%);
+    background: white;
+    padding: 0.6rem 1rem;
+    border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(2,6,23,0.08);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    min-width: 260px;
+    justify-content: center;
+}
+
+.logo-pill .logo-icon {
+    background: #ea580c;
+    color: white;
+    padding: 0.5rem;
+    border-radius: 8px;
+    font-size: 1.1rem;
+}
+
+.auth-title {
+    margin-top: 1.25rem;
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+    color: #0f172a;
+    font-weight: 700;
+}
+
+.auth-subtitle {
+    font-size: 0.9rem;
+    color: #64748b;
+    margin-bottom: 1.5rem;
+}
+
+.input-wrapper input {
+    background: rgba(255,255,255,0.9);
+    border: 1px solid rgba(15,23,42,0.06);
+    box-shadow: 0 6px 18px rgba(2,6,23,0.06) inset;
+}
+
+.input-wrapper input::placeholder {
+    color: #94a3b8;
+}
+
+.login-submit-btn {
+    background: linear-gradient(180deg,#2563eb,#1e40af);
+    box-shadow: 0 8px 18px rgba(37,99,235,0.18);
+}
+
+.login-submit-btn i { transform: translateY(1px); }
+
+/* make registration form visually consistent */
+.hidden-form { display: none; margin-top: 1rem; }
+
+@media (max-width: 480px) {
+    .logo-pill { min-width: 200px; top: -28px; }
+    .auth-wrapper { padding: 1rem; }
+    .auth-card { padding: 1.25rem; }
+}
+
+/* small helpers for logo text and meta links */
+.logo-text-title { font-weight: 700; color: #0f172a; }
+.logo-text-sub { font-size: 0.8rem; color: #6b7280; }
+.meta-links { margin-top: 1rem; text-align: center; }
+.meta-links .skip-link { margin-top: 0.5rem; display: block; font-size: 0.875rem; color: #64748b; }
