@@ -1634,6 +1634,17 @@ body {
     border: 1px solid rgba(255,255,255,0.6);
 }
 
+/* Entrance animation: start slightly down and faded, then settle into place */
+.auth-card {
+    opacity: 0;
+    transform: translateY(12px) scale(0.995);
+    transition: opacity 420ms cubic-bezier(.2,.9,.2,1), transform 420ms cubic-bezier(.2,.9,.2,1);
+}
+.auth-card.animate-in {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+
 .logo-pill {
     position: absolute;
     left: 50%;
@@ -1656,6 +1667,35 @@ body {
     padding: 0.5rem;
     border-radius: 8px;
     font-size: 1.1rem;
+}
+
+/* Floating logo animation */
+.logo-pill {
+    transition: transform 800ms ease-in-out, box-shadow 400ms ease;
+}
+.logo-pill.float {
+    animation: floatY 4s ease-in-out infinite;
+}
+@keyframes floatY {
+    0% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+    100% { transform: translateY(0); }
+}
+
+/* Subtle pulse on button when focused/hovered */
+.login-submit-btn {
+    transition: transform 220ms ease, box-shadow 220ms ease;
+}
+.login-submit-btn:hover, .login-submit-btn:focus {
+    transform: translateY(-2px);
+}
+.login-submit-btn:active {
+    transform: translateY(0);
+}
+
+/* small shimmer on input focus (soft) */
+.input-wrapper input:focus {
+    box-shadow: 0 8px 24px rgba(37,99,235,0.08), 0 0 0 4px rgba(37,99,235,0.06);
 }
 
 .auth-title {
