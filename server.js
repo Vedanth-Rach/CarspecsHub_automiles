@@ -2,8 +2,11 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const path = require('path');
+// Load .env early so MONGODB_URI is available to mongoose
+try { require('dotenv').config(); } catch (e) { /* dotenv optional */ }
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
+const session = require('express-session');
 
 const app = express();
 const PORT = 3000;
@@ -21,6 +24,15 @@ app.use(express.static(path.join(__dirname, '/')));
 // Middleware to parse form data (required for req.body.username)
 app.use(bodyParser.urlencoded({ extended: true }));
 
+// Session middleware (simple server-side sessions). In production, use a
+// persistent store (Redis, MongoStore) and set a strong SESSION_SECRET in env.
+app.use(session({
+    secret: process.env.SESSION_SECRET || 'dev-secret-session',
+    resave: false,
+    saveUninitialized: false,
+    cookie: { maxAge: 7 * 24 * 60 * 60 * 1000 } // 7 days
+}));
+
 // --- MONGODB CONNECTION SETUP ---
 // Use MONGODB_URI env var if provided (useful for Atlas). Falls back to local DB.
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://vedhurach_db_user:vedu@0907@cluster0.1enhqme.mongodb.net/?appName=Cluster0';
@@ -36,7 +48,9 @@ mongoose.connect(MONGODB_URI)
 const userSchema = new mongoose.Schema({
     email: { type: String, required: true, unique: true, lowercase: true, trim: true },
     password: { type: String, required: true },
-    createdAt: { type: Date, default: Date.now }
+    createdAt: { type: Date, default: Date.now },
+    // Wishlist: array of car ids the user has liked/saved
+    wishlist: [{ carId: { type: String }, addedAt: { type: Date, default: Date.now } }]
 });
 
 const User = mongoose.model('User', userSchema);
@@ -79,6 +93,9 @@ app.post('/login', (req, res) => {
                 const match = await bcrypt.compare(password, user.password);
                 if (match) {
                     console.log('Login successful (DB)! Redirecting to dashboard.');
+                    // Set session so subsequent API calls can identify the user
+                    req.session.userId = user._id;
+                    req.session.email = user.email;
                     return res.redirect('/dashboard.html');
                 } else {
                     console.log('Invalid credentials (DB)');
@@ -89,6 +106,9 @@ app.post('/login', (req, res) => {
             // Fallback: use mock user if DB not connected
             if (identifier === MOCK_USER.username && password === MOCK_USER.password) {
                 console.log('Login successful (mock)! Redirecting to dashboard.');
+                // For mock login, set a minimal session marker
+                req.session.userId = 'mock-user';
+                req.session.email = MOCK_USER.username;
                 return res.redirect('/dashboard.html');
             }
 
@@ -152,5 +172,76 @@ app.post('/register', async (req, res) => {
     } catch (err) {
         console.error('Registration error:', err.message);
         return res.status(500).send('Registration failed');
+    }
+});
+
+// ----------------- Wishlist API -----------------
+// Requires an authenticated session (simple session-based auth)
+function requireAuth(req, res, next) {
+    if (req.session && req.session.userId) return next();
+    return res.status(401).json({ error: 'Not authenticated' });
+}
+
+// Get current user's wishlist
+app.get('/api/wishlist', requireAuth, async (req, res) => {
+    try {
+        const userId = req.session.userId;
+        if (userId === 'mock-user') {
+            return res.json({ wishlist: [] });
+        }
+        const user = await User.findById(userId).exec();
+        if (!user) return res.status(404).json({ wishlist: [] });
+        return res.json({ wishlist: user.wishlist.map(i => i.carId) });
+    } catch (err) {
+        console.error('Get wishlist error:', err.message);
+        return res.status(500).json({ error: 'Server error' });
+    }
+});
+
+// Add car to wishlist
+app.post('/api/wishlist', requireAuth, bodyParser.urlencoded({ extended: true }), async (req, res) => {
+    try {
+        const carId = (req.body.carId || req.body.car || '').toString();
+        if (!carId) return res.status(400).json({ error: 'carId required' });
+
+        const userId = req.session.userId;
+        if (userId === 'mock-user') {
+            // For mock user we don't persist, but acknowledge
+            return res.status(201).json({ success: true });
+        }
+
+        const user = await User.findById(userId).exec();
+        if (!user) return res.status(404).json({ error: 'User not found' });
+
+        // Prevent duplicates
+        if (user.wishlist.some(w => w.carId === carId)) {
+            return res.status(200).json({ success: true, message: 'Already in wishlist' });
+        }
+
+        user.wishlist.push({ carId, addedAt: new Date() });
+        await user.save();
+        return res.status(201).json({ success: true });
+    } catch (err) {
+        console.error('Add wishlist error:', err.message);
+        return res.status(500).json({ error: 'Server error' });
+    }
+});
+
+// Remove car from wishlist
+app.delete('/api/wishlist/:carId', requireAuth, async (req, res) => {
+    try {
+        const carId = req.params.carId;
+        const userId = req.session.userId;
+        if (userId === 'mock-user') return res.json({ success: true });
+
+        const user = await User.findById(userId).exec();
+        if (!user) return res.status(404).json({ error: 'User not found' });
+
+        user.wishlist = user.wishlist.filter(w => w.carId !== carId);
+        await user.save();
+        return res.json({ success: true });
+    } catch (err) {
+        console.error('Remove wishlist error:', err.message);
+        return res.status(500).json({ error: 'Server error' });
     }
 });
