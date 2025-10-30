@@ -9,6 +9,9 @@ let budgetRecommendations = [];
 let currentView = 'BRAND_SELECT'; // 'BRAND_SELECT', 'MODEL_LIST', 'CAR_DETAILS'
 let selectedBrand = null; 
 let viewHistory = []; // Stack for navigation history: [{view: 'BRAND_SELECT', brand: null}]
+// Flag to suppress pushing to the browser history when we are programmatically
+// restoring state (e.g., on popstate) or during initial render.
+let suppressPushToBrowser = false;
 
 // GLOBAL COMPARISON STATE (NEW)
 let comparisonMode = null; // 'GLOBAL' or 'MODEL_SPECIFIC'
@@ -54,6 +57,9 @@ const brandInfoSection = document.querySelector('.brand-info'); // Reference exi
 // Initialize the app
 document.addEventListener('DOMContentLoaded', function() {
     // START UP: Only populate the dropdown and render the initial view
+    // Suppress browser history pushes while we initialize. We'll create
+    // a controlled history snapshot after the initial render.
+    suppressPushToBrowser = true;
     populateCarDropdown();
     renderContent();
     
@@ -89,6 +95,59 @@ document.addEventListener('DOMContentLoaded', function() {
     // Listener is only added if the element exists (it's inside the mainContentGrid)
     if(compareBtnModel) {
         compareBtnModel.addEventListener('click', () => showVariantSelector('MODEL_SPECIFIC'));
+    }
+
+    // Initialize browser history so Back/Forward works inside the app.
+    // Replace the current entry with an app-state marker, then push an
+    // identical state so the user can use Back to navigate within the app
+    // instead of leaving to the login page immediately.
+    try {
+        const initState = { fromApp: true, view: currentView, brand: selectedBrand, carId: selectedCar ? selectedCar.id : null };
+        if (window && window.history && window.history.replaceState && window.history.pushState) {
+            window.history.replaceState(initState, '');
+            // Push a second entry so there is an in-app history entry to go back to
+            window.history.pushState(initState, '');
+        }
+    } catch (err) {
+        console.warn('History initialization failed', err);
+    } finally {
+        // Re-enable pushing to the browser history for subsequent navigation
+        suppressPushToBrowser = false;
+    }
+});
+
+// Handle user pressing the browser Back/Forward buttons
+window.addEventListener('popstate', function(event) {
+    const state = event.state;
+    if (!state) {
+        // No state means the browser navigated away from our marked entries.
+        // Let the browser handle navigation (may go back to login page).
+        return;
+    }
+
+    if (state.fromApp) {
+        // Restore application state from the history entry
+        suppressPushToBrowser = true; // avoid echoing this change back into history
+        try {
+            currentView = state.view || 'BRAND_SELECT';
+            selectedBrand = state.brand || null;
+            if (state.carId) {
+                selectedCar = indianCarsData.find(c => c.id === state.carId) || null;
+                if (selectedCar) {
+                    selectedVariant = selectedCar.variants ? selectedCar.variants[0] : null;
+                } else {
+                    selectedVariant = null;
+                }
+            } else {
+                selectedCar = null;
+                selectedVariant = null;
+            }
+
+            renderContent();
+        } finally {
+            // allow normal pushes again
+            suppressPushToBrowser = false;
+        }
     }
 });
 
@@ -304,18 +363,41 @@ function pushHistory(view, brand = null) {
     if (viewHistory.length > 5) { // Limit history depth
         viewHistory.shift();
     }
+    // Also push a browser history entry so the native Back button works with the app state.
+    try {
+        if (!suppressPushToBrowser && window && window.history && window.history.pushState) {
+            const state = { fromApp: true, view, brand, carId: selectedCar ? selectedCar.id : null };
+            window.history.pushState(state, '');
+        }
+    } catch (err) {
+        // ignore if environment doesn't support history API
+        console.warn('History pushState failed', err);
+    }
 }
 
 window.goBack = function() {
+    // Prefer browser history navigation when possible. Triggering a native
+    // history.back() will cause a popstate event that our handler will restore.
+    if (window && window.history && window.history.length > 1) {
+        window.history.back();
+        return;
+    }
+
+    // Fallback to in-memory navigation stack
     if (viewHistory.length > 1) {
         viewHistory.pop(); // Remove current state
         const prevState = viewHistory.pop(); // Get previous state
-        
-        currentView = prevState.view;
-        selectedBrand = prevState.brand;
+
+        if (prevState) {
+            currentView = prevState.view;
+            selectedBrand = prevState.brand;
+        } else {
+            currentView = 'BRAND_SELECT';
+            selectedBrand = null;
+        }
         selectedCar = null;
         selectedVariant = null;
-        
+
         // Re-render based on previous state
         renderContent();
     } else {
