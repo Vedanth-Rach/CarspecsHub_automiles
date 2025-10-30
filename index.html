@@ -259,19 +259,6 @@
             });
         })();
     </script>
-        <script>
-            // Trigger small entrance animations when the page loads
-            document.addEventListener('DOMContentLoaded', function () {
-                const card = document.querySelector('.auth-card');
-                const logo = document.querySelector('.logo-pill');
-                const submitBtn = document.querySelector('.login-submit-btn');
-                // small timeout so the browser can paint initial state first
-                setTimeout(() => {
-                    if (card) card.classList.add('animate-in');
-                    if (logo) logo.classList.add('float');
-                    if (submitBtn) submitBtn.setAttribute('aria-live', 'polite');
-                }, 80);
-            });
-        </script>
+        
 </body>
 </html>
