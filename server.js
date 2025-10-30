@@ -23,7 +23,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 // --- MONGODB CONNECTION SETUP ---
 // Use MONGODB_URI env var if provided (useful for Atlas). Falls back to local DB.
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/carspecs';
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://vedhurach_db_user:vedu@0907@cluster0.1enhqme.mongodb.net/?appName=Cluster0';
 
 // Connect to MongoDB. Options like `useNewUrlParser` and `useUnifiedTopology`
 // are deprecated in recent drivers and are no longer required when using
@@ -141,7 +141,13 @@ app.post('/register', async (req, res) => {
 
         console.log(`Registered new user: ${email}`);
 
-        // After successful registration, redirect to login (or dashboard)
+        // If the client expects JSON (fetch/XHR), return a JSON success response.
+        // Otherwise, fall back to redirecting to the home page.
+        const acceptsJSON = req.headers.accept && req.headers.accept.includes('application/json');
+        if (acceptsJSON) {
+            return res.status(201).json({ success: true, message: 'User registered' });
+        }
+
         return res.redirect('/');
     } catch (err) {
         console.error('Registration error:', err.message);

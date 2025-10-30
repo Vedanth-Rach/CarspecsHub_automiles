@@ -150,6 +150,7 @@
         .btn-secondary { background:#f3f4f6; border:none; padding:.5rem 1rem; border-radius:6px; cursor:pointer; }
         .btn-primary { background:#2563eb; color:#fff; border:none; padding:.5rem 1rem; border-radius:6px; cursor:pointer; }
         .btn-outline { background:#fff; border:1px solid #2563eb; color:#2563eb; padding:.5rem 1rem; border-radius:6px; cursor:pointer; }
+        .hidden-form { display: none; margin-top: 1rem; }
     </style>
 </head>
 <body>
@@ -170,22 +171,43 @@
         <!-- Message Box for error/info -->
         <div id="messageBox" class="message-box"></div>
 
+        <!-- Login form -->
         <form id="loginForm" action="/login" method="POST">
             <h2 class="text-center form-title form-title-large">Sign In</h2>
 
             <div class="form-group">
                 <label for="email">Email Address</label>
                 <input type="email" id="email" name="email" placeholder="you@example.com" required>
-        <form id="loginForm" action="/login" method="POST">
-            <h2 class="text-center form-title">Sign In</h2>
+            </div>
 
             <div class="form-group">
-                <label for="email">Email Address</label>
-                <input type="email" id="email" name="email" placeholder="you@example.com" required>
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" placeholder="Your password" required>
             </div>
+
             <button type="submit" class="login-btn">
                 <i class="fas fa-sign-in-alt"></i> Sign In
             </button>
+        </form>
+
+    <!-- Registration form (hidden by default) -->
+    <form id="registerForm" action="/register" method="POST" class="hidden-form">
+            <h2 class="text-center form-title form-title-large">Create Account</h2>
+
+            <div class="form-group">
+                <label for="regEmail">Email Address</label>
+                <input type="email" id="regEmail" name="email" placeholder="you@example.com" required>
+            </div>
+
+            <div class="form-group">
+                <label for="regPassword">Password</label>
+                <input type="password" id="regPassword" name="password" placeholder="Choose a strong password" required>
+            </div>
+
+            <button type="submit" class="login-btn" id="registerBtn">Register</button>
+            <div class="switch-form mt-1">
+                Already have an account? <a href="#" id="backToLogin">Sign in</a>
+            </div>
         </form>
 
         <div class="switch-form">
@@ -225,57 +247,104 @@
             setTimeout(() => { msgBox.style.display = 'none'; }, 5000);
         }
 
-        // Intercept the login form to POST via fetch and redirect to dashboard on success.
+        // Intercept the login form and handle registration via fetch.
         (function() {
-            const form = document.getElementById('loginForm');
+            const loginForm = document.getElementById('loginForm');
+            const registerForm = document.getElementById('registerForm');
             const signUpLink = document.getElementById('signUpLink');
+            const backToLoginLink = document.getElementById('backToLogin');
 
+            function showLogin() {
+                if (registerForm) registerForm.classList.add('hidden-form');
+                if (loginForm) loginForm.classList.remove('hidden-form');
+            }
+            function showRegister() {
+                if (loginForm) loginForm.classList.add('hidden-form');
+                if (registerForm) registerForm.classList.remove('hidden-form');
+            }
+
+            // Toggle to registration form when user clicks Sign Up
             if (signUpLink) {
                 signUpLink.addEventListener('click', function(e) {
                     e.preventDefault();
-                    showMessage('Registration feature coming soon!', 'info');
+                    showRegister();
                 });
             }
 
-            if (!form) return;
-            form.addEventListener('submit', function(e) {
-                e.preventDefault();
-                const formData = new FormData(form);
-
-                // Convert FormData to object for JSON body if needed for future MongoDB integration
-                const data = {};
-                formData.forEach((value, key) => data[key] = value);
-
-                // Using the mock redirection logic from your previous files:
-                // In a real application with MongoDB/Express, this fetch call handles auth:
-                
-                fetch(form.action || '/login', {
-                    method: form.method || 'POST',
-                    headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-                    body: new URLSearchParams(formData).toString()
-                }).then(resp => {
-                    if (resp.redirected) {
-                        window.location.href = resp.url;
-                        return;
-                    }
-                    if (resp.ok) {
-                        // Assuming 200 OK means successful login if no redirect occurred
-                        window.location.href = 'dashboard.html';
-                    } else {
-                        return resp.text().then(t => { 
-                            // If the server sends an error message in the body
-                            showMessage(t || 'Login failed: Invalid credentials.', 'error');
-                        }).catch(() => {
-                            // Generic failure message if server didn't provide text
-                            showMessage('Login failed. Please check server status.', 'error');
-                        });
-                    }
-                }).catch(err => {
-                    // Fallback to client-side redirect for local file development (MOCK SUCCESS)
-                    console.warn('Fetch failed, falling back to client-side mock success:', err);
-                    window.location.href = 'dashboard.html';
+            if (backToLoginLink) {
+                backToLoginLink.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    showLogin();
                 });
-            });
+            }
+
+            // Login handler (existing behavior)
+            if (loginForm) {
+                loginForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    const formData = new FormData(loginForm);
+
+                    fetch(loginForm.action || '/login', {
+                        method: loginForm.method || 'POST',
+                        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                        body: new URLSearchParams(formData).toString()
+                    }).then(resp => {
+                        if (resp.redirected) {
+                            window.location.href = resp.url;
+                            return;
+                        }
+                        if (resp.ok) {
+                            window.location.href = 'dashboard.html';
+                        } else {
+                            return resp.text().then(t => showMessage(t || 'Login failed: Invalid credentials.', 'error'));
+                        }
+                    }).catch(err => {
+                        console.warn('Login fetch failed, falling back to client-side redirect:', err);
+                        window.location.href = 'dashboard.html';
+                    });
+                });
+            }
+
+            // Registration handler: POST to /register and expect JSON when successful
+            if (registerForm) {
+                registerForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    const formData = new FormData(registerForm);
+
+                    fetch(registerForm.action || '/register', {
+                        method: registerForm.method || 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                            'Accept': 'application/json'
+                        },
+                        body: new URLSearchParams(formData).toString()
+                    }).then(async resp => {
+                        if (resp.ok) {
+                            // If server returned JSON, parse and act accordingly
+                            try {
+                                const json = await resp.json();
+                                if (json && json.success) {
+                                    showMessage('Registration successful. Redirecting...', 'success');
+                                    // After registration, take the user to the dashboard (app allows guest access)
+                                    setTimeout(() => window.location.href = 'dashboard.html', 900);
+                                    return;
+                                }
+                            } catch (err) {
+                                // If response wasn't JSON, fallback to redirect
+                                window.location.href = '/';
+                                return;
+                            }
+                        }
+
+                        // If we reach here, treat as error
+                        const text = await resp.text().catch(() => 'Registration failed');
+                        showMessage(text || 'Registration failed', 'error');
+                    }).catch(err => {
+                        console.error('Registration request failed:', err);
+                        showMessage('Registration failed. Is the server running?', 'error');
+                    });
+                });
+            }
         })();
 
         // (Warning-related UI changes removed) — server-side error flag handling reverted.
