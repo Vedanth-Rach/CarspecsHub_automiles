@@ -796,6 +796,16 @@ body {
     margin-bottom: 0.5rem;
 }
 
+.brand-logo {
+    width: 56px;
+    height: 56px;
+    object-fit: cover;
+    border-radius: 12px;
+    display: block;
+    margin: 0 auto 0.75rem auto;
+    box-shadow: 0 6px 12px rgba(2,6,23,0.06);
+}
+
 .brand-card p {
     color: #374151;
     font-size: 0.875rem;

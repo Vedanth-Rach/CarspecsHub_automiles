@@ -158,26 +158,32 @@
 				<h2>Popular Indian Car Brands</h2>
 				<div class="brand-grid">
 					<div class="brand-card maruti">
+						<img class="brand-logo" data-brand="Maruti Suzuki" alt="Maruti Suzuki logo">
 						<h3>Maruti Suzuki</h3>
 						<p>India's largest car manufacturer, known for <strong>high fuel efficiency</strong>, low maintenance costs, and an unmatched service network across the country. They dominate the hatchback and budget segments.</p>
 					</div>
 					<div class="brand-card tata">
+						<img class="brand-logo" data-brand="Tata" alt="Tata logo">
 						<h3>Tata Motors</h3>
 						<p>An Indian automotive giant prioritizing <strong>safety and solid build quality</strong>. They are pioneers in the EV space and offer popular SUVs like Nexon and Harrier, often achieving 5-star safety ratings.</p>
 					</div>
 					<div class="brand-card hyundai">
+						<img class="brand-logo" data-brand="Hyundai" alt="Hyundai logo">
 						<h3>Hyundai</h3>
 						<p>A Korean brand recognized for its <strong>premium feature-packed interiors</strong>, modern styling, and wide range of powerful, refined engine options. Models like Creta and Venue are market leaders in their segments.</p>
 					</div>
 					<div class="brand-card mahindra">
+						<img class="brand-logo" data-brand="Mahindra" alt="Mahindra logo">
 						<h3>Mahindra</h3>
 						<p>Known for <strong>rugged, capable SUVs</strong> with a commanding presence. Mahindra focuses on powerful engine options and advanced technology, especially in their flagship models like the XUV700 and Scorpio-N.</p>
 					</div>
 					<div class="brand-card toyota">
+						<img class="brand-logo" data-brand="Toyota" alt="Toyota logo">
 						<h3>Toyota</h3>
 						<p>Synonymous with <strong>unwavering reliability, durability, and high resale value</strong>. While often positioned in the premium segments, their products offer superior build quality and long-term peace of mind, especially the Innova and Fortuner.</p>
 					</div>
 					<div class="brand-card honda">
+						<img class="brand-logo" data-brand="Honda" alt="Honda logo">
 						<h3>Honda</h3>
 						<p>Famous for its <strong>refined i-VTEC engines</strong>, spacious cabins, and smooth driving experience, particularly in the sedan segment with the iconic Honda City. They balance performance with comfort and efficiency.</p>
 					</div>
@@ -261,6 +267,20 @@
 			// to clear the session on the server side first.
 			window.location.href = '/'; 
 		});
+	</script>
+	<script>
+	// Once app.js is loaded, populate any static brand-logo placeholders with generated data-URL SVGs
+	(function setStaticBrandLogos(){
+		if (typeof brandLogoDataURL !== 'function') return; // app.js not loaded or function missing
+		document.querySelectorAll('.brand-logo[data-brand]').forEach(img => {
+			const brand = img.getAttribute('data-brand');
+			try {
+				img.src = brandLogoDataURL(brand);
+			} catch (e) {
+				// leave empty if something fails
+			}
+		});
+	})();
 	</script>
 </body>
 </html>

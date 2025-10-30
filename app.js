@@ -715,6 +715,32 @@ function getBrandLogo(brand) {
     return map[brand] || fallback;
 }
 
+// Generate a small SVG data URL as a brand logo (avoids external network fetches)
+function brandLogoDataURL(brand) {
+        // color palette for known brands (fallback to neutral)
+        const colors = {
+                'Maruti Suzuki': '#e9d5ff',
+                'Tata': '#bfdbfe',
+                'Hyundai': '#fde68a',
+                'Mahindra': '#fed7aa',
+                'Toyota': '#bbf7d0',
+                'Honda': '#fef3c7',
+                'Kia': '#f3e8ff',
+                'MG': '#f0f9ff',
+                'BYD': '#fef2f2'
+        };
+
+        const bg = colors[brand] || '#f3f4f6';
+        const initials = brand.split(' ').map(w => w[0]).slice(0,2).join('').toUpperCase();
+        const svg = `
+            <svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'>
+                <rect width='100%' height='100%' rx='20' fill='${bg}' />
+                <text x='50%' y='54%' dominant-baseline='middle' text-anchor='middle' font-family='Arial, Helvetica, sans-serif' font-size='56' fill='#0f172a' font-weight='700'>${initials}</text>
+            </svg>`;
+
+        return 'data:image/svg+xml;utf8,' + encodeURIComponent(svg);
+}
+
 // Renders the list of brands as clickable cards
 function renderBrandGrid() {
     const brands = getUniqueBrands();
@@ -722,9 +748,10 @@ function renderBrandGrid() {
         <div class="brand-grid" style="grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-top: 2rem;">
             ${brands.map(brand => {
                 const brandClass = getBrandLogo(brand);
+                const logo = brandLogoDataURL(brand);
                 return `
                     <div class="brand-card ${brandClass}" onclick="selectBrand('${brand}')" style="cursor: pointer; text-align: center; padding: 1.5rem; border: 1px solid #e5e7eb; transition: transform 0.2s, box-shadow 0.2s;">
-                        <i class="fas fa-car" style="font-size: 2rem; margin-bottom: 0.5rem; color: #111827;"></i>
+                        <img src="${logo}" alt="${brand} logo" class="brand-logo" />
                         <h3 style="font-weight: 600; font-size: 1.125rem;">${brand}</h3>
                         <p style="font-size: 0.75rem; color: #6b7280;">(${indianCarsData.filter(c => c.brand === brand).length} Models)</p>
                     </div>

@@ -1,0 +1,3 @@
+id,brand,model,year,category,bodyType,seatingCapacity,budgetCategory,description,pros,cons,variants,colors,image,videoReview
+maruti-alto-k10-2025,Maruti Suzuki,Alto K10,2025,Entry Hatchback,5-Door Hatchback,5,budget,"Most affordable city car","Affordable|Fuel efficient","Basic interior|Small boot","[{\"id\":\"alto-k10-std\",\"name\":\"STD\",\"pricing\":{\"exShowroom\":399000}}]","Solid White|Red|Silver","https://example.com/alto.png",""
+toyota-glanza-2025,Toyota,Glanza,2025,Premium Hatchback,5-Door Hatchback,5,mid-range,"Premium hatchback alternative","Feature-rich|Good resale","Higher price","[{\"id\":\"glanza-g\",\"name\":\"G\",\"pricing\":{\"exShowroom\":749000}}]","Pearl White|Grey","https://example.com/glanza.png",""
