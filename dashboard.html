@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>CarSpecs India - Indian Car Information Platform</title>
+	<link rel="stylesheet" href="styles.css">
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+	<style>
+		/* CSS specific to new selection dropdown */
+		.input-group select#carDropdown {
+			padding: 0.75rem 1rem;
+			border: 2px solid #e5e7eb;
+			border-radius: 0.5rem;
+			font-size: 1rem;
+			width: 100%;
+			transition: border-color 0.2s;
+			appearance: none; /* Remove default arrow */
+			background-color: #f9fafb;
+			background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%236b7280'%3E%3Cpath fill-rule='evenodd' d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z' clip-rule='evenodd' /%3E%3C/svg%3E");
+			background-repeat: no-repeat;
+			background-position: right 1rem center;
+			background-size: 1.5em;
+		}
+
+		/* Styling for the new model-specific comparison button */
+		.model-compare-btn {
+			padding: 0.75rem 1.5rem;
+			background: #3b82f6; /* Blue for model compare */
+			color: white;
+			border: none;
+			border-radius: 0.5rem;
+			font-weight: 500;
+			cursor: pointer;
+			transition: background-color 0.2s;
+			display: flex;
+			align-items: center;
+			gap: 0.5rem;
+			margin-top: 1rem;
+			justify-content: center;
+		}
+		.model-compare-btn:hover {
+			background: #1d4ed8;
+		}
+	</style>
+</head>
+<body>
+	<header class="header">
+		<div class="container">
+			<div class="header-content">
+				<div class="logo-section">
+					<div class="logo-icon">
+						<i class="fas fa-car"></i>
+					</div>
+					<div class="logo-text">
+						<h1>CarSpecs India</h1>
+						<div class="subtitle">
+							<i class="fas fa-map-marker-alt"></i>
+							<span>Indian Car Information Platform</span>
+						</div>
+					</div>
+				</div>
+                
+					<button id="logoutBtn" class="budget-btn logout-btn">
+					<i class="fas fa-sign-out-alt"></i>
+					Log Out
+				</button>
+
+				<!-- Global Compare Button (Always visible in the header) -->
+				<button id="compareBtnGlobal" class="compare-btn">
+					<i class="fas fa-exchange-alt"></i>
+					Compare All Models
+				</button>
+				
+				<button id="budgetBtn" class="budget-btn">
+					<i class="fas fa-calculator"></i>
+					Budget Finder
+				</button>
+			</div>
+		</div>
+	</header>
+
+	<main class="main-content">
+		<div class="container">
+			
+			<section id="initialSelection" class="card initial-selection">
+				<h2 class="card-title text-center initial-title">
+					<i class="fas fa-search"></i> Select a Car to View Details
+				</h2>
+				<p class="text-center mb-4 text-sm">Use the selector below or the list on the left to begin exploring specs.</p>
+				<div class="input-group centered">
+					<label for="carDropdown" class="sr-only">Choose a Car Model</label>
+					<select id="carDropdown" class="form-select" title="Choose a Car Model" aria-label="Choose a Car Model" onchange="selectCarFromDropdown(this.value)">
+						<option value="">-- Choose a Car Model --</option>
+						</select>
+					
+					<!-- NEW: Global Compare Button in the initial selection screen -->
+					<button id="compareBtnGlobalAlt" class="model-compare-btn compare-alt">
+						<i class="fas fa-exchange-alt"></i>
+						Compare All Models/Variants
+					</button>
+
+				</div>
+			</section>
+			
+			<section id="carShowcase" class="car-showcase hidden">
+				<!-- Dynamic content will be inserted here -->
+			</section>
+
+			<div class="content-grid hidden" id="mainContentGrid">
+				<div class="left-column">
+					<div id="carSelector" class="car-selector">
+						<!-- Dynamic content will be inserted here -->
+					</div>
+					
+					<div id="variantSelector" class="variant-selector">
+						<!-- Dynamic content will be inserted here -->
+					</div>
+					
+					<!-- NEW: Model-specific Compare Button (for when a car is selected) -->
+					<div id="compareBtnModelContainer" class="compare-btn-model-container card hidden">
+						<h4 id="compareModelTitle">Compare Variants</h4>
+						<button id="compareBtnModel" class="model-compare-btn">
+							<i class="fas fa-list-ul"></i> Compare Variants
+						</button>
+					</div>
+
+				</div>
+
+				<div class="middle-column">
+					<div id="specsPanel" class="specs-panel">
+						<!-- Dynamic content will be inserted here -->
+					</div>
+					<div id="featuresPanel" class="features-panel">
+						<!-- Dynamic content will be inserted here -->
+					</div>
+				</div>
+
+				<div class="right-column">
+					<div id="carDetails" class="car-details">
+						<!-- Dynamic content will be inserted here -->
+					</div>
+				</div>
+			</div>
+
+			<!-- UPDATED BRAND INFORMATION SECTION -->
+			<section class="brand-info">
+				<h2>Popular Indian Car Brands</h2>
+				<div class="brand-grid">
+					<div class="brand-card maruti">
+						<h3>Maruti Suzuki</h3>
+						<p>India's largest car manufacturer, known for <strong>high fuel efficiency</strong>, low maintenance costs, and an unmatched service network across the country. They dominate the hatchback and budget segments.</p>
+					</div>
+					<div class="brand-card tata">
+						<h3>Tata Motors</h3>
+						<p>An Indian automotive giant prioritizing <strong>safety and solid build quality</strong>. They are pioneers in the EV space and offer popular SUVs like Nexon and Harrier, often achieving 5-star safety ratings.</p>
+					</div>
+					<div class="brand-card hyundai">
+						<h3>Hyundai</h3>
+						<p>A Korean brand recognized for its <strong>premium feature-packed interiors</strong>, modern styling, and wide range of powerful, refined engine options. Models like Creta and Venue are market leaders in their segments.</p>
+					</div>
+					<div class="brand-card mahindra">
+						<h3>Mahindra</h3>
+						<p>Known for <strong>rugged, capable SUVs</strong> with a commanding presence. Mahindra focuses on powerful engine options and advanced technology, especially in their flagship models like the XUV700 and Scorpio-N.</p>
+					</div>
+					<div class="brand-card toyota">
+						<h3>Toyota</h3>
+						<p>Synonymous with <strong>unwavering reliability, durability, and high resale value</strong>. While often positioned in the premium segments, their products offer superior build quality and long-term peace of mind, especially the Innova and Fortuner.</p>
+					</div>
+					<div class="brand-card honda">
+						<h3>Honda</h3>
+						<p>Famous for its <strong>refined i-VTEC engines</strong>, spacious cabins, and smooth driving experience, particularly in the sedan segment with the iconic Honda City. They balance performance with comfort and efficiency.</p>
+					</div>
+				</div>
+			</section>
+			<!-- END BRAND INFORMATION SECTION -->
+
+		</div>
+	</main>
+	
+	<!-- Comparison Modal -->
+	<div id="comparisonModal" class="modal">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h2>Variant Comparison</h2>
+				<button id="closeModal" class="close-btn" aria-label="Close dialog" title="Close">
+					<i class="fas fa-times"></i>
+				</button>
+			</div>
+			<div id="comparisonContent" class="comparison-content">
+				<!-- Dynamic comparison content -->
+			</div>
+		</div>
+	</div>
+
+	<!-- Budget Modal -->
+	<div id="budgetModal" class="modal">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h2>Find Cars Within Your Budget</h2>
+				<button id="closeBudgetModal" class="close-btn" aria-label="Close dialog" title="Close">
+					<i class="fas fa-times"></i>
+				</button>
+			</div>
+			<div class="budget-modal-content">
+				<form id="budgetForm" class="budget-form">
+					<div class="budget-input-group">
+						<label for="budget">What's your budget for a new car?</label>
+						<div class="budget-input-wrapper">
+							<span class="currency-symbol">₹</span>
+							<input type="number" 
+								   id="budget" 
+								   name="budget" 
+								   placeholder="Enter your budget in rupees" 
+								   min="300000" 
+								   max="10000000" 
+								   step="50000" 
+								   required>
+							<span class="budget-unit">Lakhs</span>
+						</div>
+						<div class="budget-suggestions">
+							<button type="button" onclick="setBudget(500000)">₹5 Lakh</button>
+							<button type="button" onclick="setBudget(1000000)">₹10 Lakh</button>
+							<button type="button" onclick="setBudget(1500000)">₹15 Lakh</button>
+							<button type="button" onclick="setBudget(2000000)">₹20 Lakh</button>
+							<button type="button" onclick="setBudget(3000000)">₹30 Lakh</button>
+						</div>
+					</div>
+					<button type="submit" class="budget-submit-btn">Find Recommended Cars</button>
+				</form>
+				
+				<div id="budgetRecommendations" class="budget-recommendations">
+					<!-- Dynamic budget recommendations -->
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<!-- NOTE: The 'messageModal' element is dynamically created by app.js when needed -->
+
+	<script src="data.js"></script>
+	<script src="app.js"></script>
+	<script>
+		function setBudget(amount) {
+			document.getElementById('budget').value = amount;
+		}
+		
+		// Log Out Button Action (Client-side redirect to login)
+		document.getElementById('logoutBtn').addEventListener('click', function() {
+			// In a real application, this would send a POST request to a /logout route
+			// to clear the session on the server side first.
+			window.location.href = '/'; 
+		});
+	</script>
+</body>
+</html>

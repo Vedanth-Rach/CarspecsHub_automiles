@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - CarSpecs India</title>
+    <!-- Assuming styles.css contains the shared utility styles -->
+    <link rel="stylesheet" href="styles.css"> 
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Specific styles for the login layout (based on your 2nd code block) */
+        body {
+            /* General Layout: Centering the entire content */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #e5e7eb; /* Light grey background for the login screen */
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+        .login-container {
+            width: 100%;
+            max-width: 400px;
+            background: white;
+            padding: 2rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        .login-logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            margin-bottom: 2rem;
+        }
+        .login-logo .logo-icon {
+            font-size: 2rem;
+            padding: 0.75rem;
+            background: #ea580c; /* Using the primary orange color */
+            color: white;
+            border-radius: 0.5rem;
+        }
+        .login-logo .logo-text h1 {
+            font-size: 1.5rem;
+            color: #111827;
+        }
+        .login-logo .subtitle {
+            font-size: 0.875rem;
+            color: #6b7280;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        .form-group label {
+            display: block;
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 1px #2563eb;
+        }
+        .login-btn {
+            width: 100%;
+            padding: 0.75rem;
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .login-btn:hover {
+            background: #1d4ed8;
+        }
+        .switch-form {
+            text-align: center;
+            margin-top: 1.5rem;
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+        .switch-form a {
+            color: #ea580c;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .switch-form a:hover {
+            text-decoration: underline;
+        }
+
+        .mt-1 {
+            margin-top: 1rem;
+        }
+
+        /* .form-title CSS has been moved to the external styles.css (styles.css) */
+        .text-center {
+            text-align: center;
+        }
+
+        /* Message box styling for alerts */
+        .message-box {
+            background: #fff3cd;
+            color: #856404;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            border: 1px solid #ffeeba;
+            margin-bottom: 1rem;
+            display: none; /* Controlled by JS */
+        }
+
+        /* Skip modal styles */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.4);
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+        .skip-modal {
+            background: #fff;
+            padding: 1.25rem;
+            border-radius: 8px;
+            max-width: 420px;
+            width: 90%;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            text-align: left;
+        }
+    .skip-modal h3 { margin: 0 0 .5rem; }
+    .skip-modal p { margin: 0 0 1rem; color: #374151; }
+    .form-title-large { font-size: 1.5rem; color: #111827; margin-bottom: 1.5rem; }
+        .skip-actions { display:flex; gap:0.5rem; justify-content:flex-end; }
+        .btn-secondary { background:#f3f4f6; border:none; padding:.5rem 1rem; border-radius:6px; cursor:pointer; }
+        .btn-primary { background:#2563eb; color:#fff; border:none; padding:.5rem 1rem; border-radius:6px; cursor:pointer; }
+        .btn-outline { background:#fff; border:1px solid #2563eb; color:#2563eb; padding:.5rem 1rem; border-radius:6px; cursor:pointer; }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-logo">
+            <div class="logo-icon">
+                <i class="fas fa-car"></i>
+            </div>
+            <div class="logo-text">
+                <h1>CarSpecs India</h1>
+            <h2 class="text-center form-title">Sign In</h2>
+                    <i class="fas fa-lock"></i>
+                    <span>Secure Access Portal</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Message Box for error/info -->
+        <div id="messageBox" class="message-box"></div>
+
+        <form id="loginForm" action="/login" method="POST">
+            <h2 class="text-center form-title form-title-large">Sign In</h2>
+
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" name="email" placeholder="you@example.com" required>
+        <form id="loginForm" action="/login" method="POST">
+            <h2 class="text-center form-title">Sign In</h2>
+
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" name="email" placeholder="you@example.com" required>
+            </div>
+            <button type="submit" class="login-btn">
+                <i class="fas fa-sign-in-alt"></i> Sign In
+            </button>
+        </form>
+
+        <div class="switch-form">
+            Don't have an account? 
+            <!-- Use JS to show a message instead of alert() -->
+            <a href="#" id="signUpLink">Sign Up</a>
+        </div>
+        <div class="switch-form mt-1">
+            <a href="#" id="skipLink">Skip and Browse Cars <i class="fas fa-arrow-right"></i></a>
+        </div>
+
+        <!-- Skip confirmation modal -->
+        <div id="skipModal" class="modal-overlay" aria-hidden="true">
+            <div class="skip-modal" role="dialog" aria-modal="true" aria-labelledby="skipModalTitle">
+                <h3 id="skipModalTitle">Sign in to continue</h3>
+                <p>You can sign in to save your preferences and access full features. You can also continue as a guest.</p>
+                <div class="skip-actions">
+                    <button id="skipCancelBtn" type="button" class="btn-secondary">Cancel</button>
+                    <button id="skipGuestBtn" type="button" class="btn-primary">Continue as guest</button>
+                    <button id="skipLoginBtn" type="button" class="btn-outline">Log in</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const msgBox = document.getElementById('messageBox');
+        
+        function showMessage(message, type = 'error') {
+            msgBox.textContent = message;
+            msgBox.style.display = 'block';
+            msgBox.style.backgroundColor = type === 'error' ? '#f8d7da' : '#d4edda';
+            msgBox.style.color = type === 'error' ? '#721c24' : '#155724';
+            msgBox.style.borderColor = type === 'error' ? '#f5c6cb' : '#c3e6cb';
+            
+            // Auto hide after 5 seconds
+            setTimeout(() => { msgBox.style.display = 'none'; }, 5000);
+        }
+
+        // Intercept the login form to POST via fetch and redirect to dashboard on success.
+        (function() {
+            const form = document.getElementById('loginForm');
+            const signUpLink = document.getElementById('signUpLink');
+
+            if (signUpLink) {
+                signUpLink.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    showMessage('Registration feature coming soon!', 'info');
+                });
+            }
+
+            if (!form) return;
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const formData = new FormData(form);
+
+                // Convert FormData to object for JSON body if needed for future MongoDB integration
+                const data = {};
+                formData.forEach((value, key) => data[key] = value);
+
+                // Using the mock redirection logic from your previous files:
+                // In a real application with MongoDB/Express, this fetch call handles auth:
+                
+                fetch(form.action || '/login', {
+                    method: form.method || 'POST',
+                    headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                    body: new URLSearchParams(formData).toString()
+                }).then(resp => {
+                    if (resp.redirected) {
+                        window.location.href = resp.url;
+                        return;
+                    }
+                    if (resp.ok) {
+                        // Assuming 200 OK means successful login if no redirect occurred
+                        window.location.href = 'dashboard.html';
+                    } else {
+                        return resp.text().then(t => { 
+                            // If the server sends an error message in the body
+                            showMessage(t || 'Login failed: Invalid credentials.', 'error');
+                        }).catch(() => {
+                            // Generic failure message if server didn't provide text
+                            showMessage('Login failed. Please check server status.', 'error');
+                        });
+                    }
+                }).catch(err => {
+                    // Fallback to client-side redirect for local file development (MOCK SUCCESS)
+                    console.warn('Fetch failed, falling back to client-side mock success:', err);
+                    window.location.href = 'dashboard.html';
+                });
+            });
+        })();
+
+        // (Warning-related UI changes removed) — server-side error flag handling reverted.
+        // Skip link behavior: show modal asking to log in or continue as guest
+        (function() {
+            const skipLink = document.getElementById('skipLink');
+            const skipModal = document.getElementById('skipModal');
+            const skipCancelBtn = document.getElementById('skipCancelBtn');
+            const skipGuestBtn = document.getElementById('skipGuestBtn');
+            const skipLoginBtn = document.getElementById('skipLoginBtn');
+            const emailInput = document.getElementById('email');
+
+            if (!skipLink || !skipModal) return;
+
+            function openSkipModal() {
+                skipModal.style.display = 'flex';
+                skipModal.setAttribute('aria-hidden', 'false');
+            }
+            function closeSkipModal() {
+                skipModal.style.display = 'none';
+                skipModal.setAttribute('aria-hidden', 'true');
+            }
+
+            skipLink.addEventListener('click', function(e) {
+                e.preventDefault();
+                openSkipModal();
+            });
+
+            skipCancelBtn && skipCancelBtn.addEventListener('click', function() {
+                closeSkipModal();
+            });
+
+            skipGuestBtn && skipGuestBtn.addEventListener('click', function() {
+                // Continue to dashboard as guest
+                window.location.href = 'dashboard.html';
+            });
+
+            skipLoginBtn && skipLoginBtn.addEventListener('click', function() {
+                // Close modal and focus the login form so the user can sign in
+                closeSkipModal();
+                if (emailInput) {
+                    emailInput.focus();
+                    // Optionally scroll to top where the form is
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+            });
+        })();
+    </script>
+</body>
+</html>
