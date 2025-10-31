@@ -1465,7 +1465,7 @@ const indianCarsData = [
     description: 'The Kia Seltos 2025 is a feature-packed compact SUV with bold design, advanced technology, and multiple engine options.',
     pros: ['Bold design', 'Feature-rich', 'Multiple engine options', 'Good build quality', 'Spacious interior'],
     cons: ['Average fuel efficiency', 'Service network', 'Road noise', 'Expensive variants'],
-    videoReview: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+    videoReview: 'https://www.youtube.com/embed/kOMFqaYb2WA?si=RQI8hO1FhfS6fOuc',
     variants: [
       {
         id: 'seltos-hte',
@@ -1495,7 +1495,7 @@ const indianCarsData = [
           features: ['6 Airbags', 'ABS with EBD', 'ESC', 'Hill Start Assist', 'ISOFIX']
         },
         colors: ['Clear White', 'Steel Silver', 'Gravity Grey'],
-        image: 'https://imgd.aeplcdn.com/664x374/n/cw/ec/115777/seltos-exterior-right-front-three-quarter-73.jpeg'
+        image: 'https://stimg.cardekho.com/images/carexteriorimages/930x620/Kia/Seltos/8709/1755775088156/front-left-side-47.jpg'
       },
       {
         id: 'seltos-htk',
@@ -1572,7 +1572,7 @@ const indianCarsData = [
     description: 'The MG Astor 2025 is a mid-range compact SUV known for its premium, feature-loaded cabin, personal AI assistant, and distinct British styling.',
     pros: ['Premium interior quality', 'Feature-rich (AI assistant, ADAS)', 'Comfortable ride', 'High safety ratings', 'Turbo-petrol option'],
     cons: ['Average fuel efficiency', 'High maintenance costs', 'Relatively small dealer network', 'CVT gearbox performance'],
-    videoReview: 'https://www.youtube.com/embed/iA6zM-vY-F8?si=g7zM_1r5Q_wX-u6C', // Placeholder review
+    videoReview: 'https://www.youtube.com/embed/Rdg9mSTGT9I?si=8KNYiwLhbAh1vRn5', // Placeholder review
     variants: [
       {
         id: 'astor-style',
@@ -1602,7 +1602,7 @@ const indianCarsData = [
           features: ['ABS with EBD', 'Brake Assist', 'ESP', 'Traction Control', 'Hill Hold', 'ISOFIX']
         },
         colors: ['White', 'Silver', 'Black'],
-        image: 'https://imgd.aeplcdn.com/1056x594/n/cw/ec/52217/astor-exterior-right-front-three-quarter-3.jpeg?isig=0&q=80'
+        image: 'https://imgd.aeplcdn.com/1056x594/n/h86p3ab_1672819.jpg?q=80'
       },
       {
         id: 'astor-super-turbo',
@@ -1632,7 +1632,7 @@ const indianCarsData = [
           features: ['ABS with EBD', 'Brake Assist', 'ESP', 'Traction Control', 'Hill Hold', 'ISOFIX', '360 Camera', 'ADAS Level 2']
         },
         colors: ['White', 'Silver', 'Black', 'Red', 'Orange'],
-        image: 'https://imgd.aeplcdn.com/1056x594/n/cw/ec/52217/astor-exterior-right-front-three-quarter-3.jpeg?isig=0&q=80'
+        image: 'https://imgd.aeplcdn.com/1056x594/n/h86p3ab_1672819.jpg?q=80'
       }
     ]
   },
