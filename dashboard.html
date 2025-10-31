@@ -269,18 +269,48 @@
 		});
 	</script>
 	<script>
-	// Once app.js is loaded, populate any static brand-logo placeholders with generated data-URL SVGs
-	(function setStaticBrandLogos(){
-		if (typeof brandLogoDataURL !== 'function') return; // app.js not loaded or function missing
-		document.querySelectorAll('.brand-logo[data-brand]').forEach(img => {
-			const brand = img.getAttribute('data-brand');
+	// Try to load exact brand logos from local assets if present.
+	// Fallback: generated inline SVG (brandLogoDataURL).
+	function tryLoadBrandLogosOnce() {
+		if (typeof brandLogoDataURL !== 'function') return;
+		const imgs = document.querySelectorAll('.brand-logo');
+		imgs.forEach(img => {
+			const brand = img.getAttribute('data-brand') || img.getAttribute('alt') || '';
+			// compute slug using the same logic as app.js
+			let slug = brand.replace(/\s+/g, '-').toLowerCase();
 			try {
-				img.src = brandLogoDataURL(brand);
-			} catch (e) {
-				// leave empty if something fails
-			}
+				if (typeof getBrandLogo === 'function') {
+					const mapped = getBrandLogo(brand);
+					// if mapped value contains letters and no spaces, use it as slug
+					if (mapped && typeof mapped === 'string') slug = mapped;
+				}
+			} catch (e) { /* ignore and use fallback slug */ }
+
+			const localPng = `/assets/logos/${slug}.png`;
+			const localSvg = `/assets/logos/${slug}.svg`;
+
+			// Preload PNG then SVG; if neither exists use generated SVG data-URL
+			const loader = new Image();
+			loader.onload = function() { img.src = localPng; };
+			loader.onerror = function() {
+				// try svg
+				const loader2 = new Image();
+				loader2.onload = function() { img.src = localSvg; };
+				loader2.onerror = function() {
+					// final fallback: generated inline SVG
+					img.src = brandLogoDataURL(brand);
+				};
+				loader2.src = localSvg;
+			};
+			loader.src = localPng;
 		});
-	})();
+	}
+
+	// Run on DOMContentLoaded and again after a short delay to catch dynamically-rendered brand cards.
+	document.addEventListener('DOMContentLoaded', () => {
+		tryLoadBrandLogosOnce();
+		setTimeout(tryLoadBrandLogosOnce, 600);
+	});
 	</script>
 </body>
 </html>
