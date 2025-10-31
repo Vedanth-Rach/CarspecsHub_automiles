@@ -35,15 +35,19 @@ app.use(session({
 }));
 
 // --- MONGODB CONNECTION SETUP ---
-// Use MONGODB_URI env var if provided (useful for Atlas). Falls back to local DB.
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://vedhurach_db_user:vedu@0907@cluster0.1enhqme.mongodb.net/?appName=Cluster0';
+// Require an explicit MONGODB_URI environment variable for production.
+// Do NOT keep production credentials in source code. If MONGODB_URI is
+// not provided we skip attempting to connect and continue in "mock" mode.
+const MONGODB_URI = process.env.MONGODB_URI;
 
-// Connect to MongoDB. Options like `useNewUrlParser` and `useUnifiedTopology`
-// are deprecated in recent drivers and are no longer required when using
-// modern mongoose versions — let mongoose pick sensible defaults.
-mongoose.connect(MONGODB_URI)
-    .then(() => console.log('MongoDB connected:', MONGODB_URI))
-    .catch(err => console.warn('MongoDB connection error (continuing with mock user):', err.message));
+if (MONGODB_URI) {
+    // Connect to MongoDB. Let mongoose use sensible defaults for modern drivers.
+    mongoose.connect(MONGODB_URI)
+        .then(() => console.log('MongoDB connected'))
+        .catch(err => console.warn('MongoDB connection error (continuing with mock user):', err.message));
+} else {
+    console.warn('MONGODB_URI is not set — skipping MongoDB connection. App will run in mock/no-DB mode.');
+}
 
 // Define a simple User Schema for MongoDB
 const userSchema = new mongoose.Schema({
