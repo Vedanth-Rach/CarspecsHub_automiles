@@ -1649,7 +1649,7 @@ const indianCarsData = [
     description: 'The BYD Atto 3 2025 is a premium electric SUV known for its blade battery technology, long range, and high-tech, spacious interior.',
     pros: ['Excellent range (400+ km)', 'Unique, high-tech interior', '5-star Euro NCAP rating', 'Fast charging capability', 'Zero emissions'],
     cons: ['High initial price', 'Limited service network', 'Design is polarizing', 'Long charging times on slow chargers'],
-    videoReview: 'https://www.youtube.com/embed/8qR-Yd-8qI8?si=l6B7jTq4v_0z6gR4', // Placeholder review
+	videoReview: 'https://www.youtube.com/embed/MujKOnPF8FE', // Embedded AutoDeal walkaround (kept per user request)
     variants: [
       {
         id: 'atto3-extended-range',
