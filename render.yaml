@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: CarspecsHub-web
+    env: node
+    branch: main
+    buildCommand: "npm install"
+    startCommand: "npm start"
+    plan: free
+    autoDeploy: true
