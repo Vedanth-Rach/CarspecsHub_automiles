@@ -782,6 +782,11 @@ body {
     background: linear-gradient(135deg, #faf5ff, #e9d5ff);
 }
 
+/* Ensure dynamically-generated brand class (from app.js getBrandLogo) matches styling */
+.brand-card.maruti-suzuki {
+    background: linear-gradient(135deg, #faf5ff, #e9d5ff);
+}
+
 .brand-card.tata {
     background: linear-gradient(135deg, #eff6ff, #bfdbfe);
 }
