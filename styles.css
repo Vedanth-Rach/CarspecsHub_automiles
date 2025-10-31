@@ -790,6 +790,23 @@ body {
     background: linear-gradient(135deg, #fef3c7, #fde68a);
 }
 
+/* New gradients to color previously-white brand cards */
+.brand-card.byd {
+    background: linear-gradient(135deg, #fff1f2, #fee2e2); /* soft pink */
+}
+
+.brand-card.honda {
+    background: linear-gradient(135deg, #fff7ed, #fff3bf); /* light warm yellow */
+}
+
+.brand-card.kia {
+    background: linear-gradient(135deg, #f8f0ff, #efe6ff); /* soft purple */
+}
+
+.brand-card.mg {
+    background: linear-gradient(135deg, #f0f9ff, #e6f6ff); /* pale blue */
+}
+
 .brand-card h3 {
     font-weight: 600;
     color: #111827;

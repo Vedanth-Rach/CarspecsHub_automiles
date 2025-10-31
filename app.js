@@ -710,8 +710,10 @@ function getBrandLogo(brand) {
         'Honda': 'honda',
         'Kia': 'kia'
     };
-    // Use font-awesome icon or first two letters as fallback
-    const fallback = brand.substring(0, 2).toUpperCase(); 
+    // Return a short css-friendly class name for the brand.
+    // Use the explicit map when available, otherwise slugify the brand name
+    // (lowercase, spaces -> hyphens) so CSS selectors can target it.
+    const fallback = brand.replace(/\s+/g, '-').toLowerCase();
     return map[brand] || fallback;
 }
 
