@@ -9,7 +9,8 @@ const bcrypt = require('bcryptjs');
 const session = require('express-session');
 
 const app = express();
-const PORT = 3000;
+// Use platform-provided port (Render, Heroku, etc.) or fall back to 3000 for local dev
+const PORT = process.env.PORT || 3000;
 
 // Simple request logger to help debug which path the browser requests
 app.use((req, res, next) => {
