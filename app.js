@@ -60,16 +60,22 @@ const tabWishlist = document.getElementById('tabWishlist');
 
 // Wishlist state for the current logged-in user
 let userWishlist = new Set(); // set of carIds
+// Track whether the current visitor is authenticated (server session)
+let isAuthenticated = false;
 
 // Load wishlist from server (if authenticated). Populates userWishlist set.
 function loadWishlist() {
     fetch('/api/wishlist', { credentials: 'same-origin' })
         .then(resp => {
             if (resp.status === 401) {
-                // Not authenticated; ignore silently
+                // Not authenticated; mark state and update UI
+                isAuthenticated = false;
+                updateWishlistButtons();
                 return null;
             }
             if (!resp.ok) throw new Error('Failed to load wishlist');
+            // Authenticated
+            isAuthenticated = true;
             return resp.json();
         }).then(json => {
             if (!json || !json.wishlist) return;
@@ -144,12 +150,22 @@ function updateWishlistButtons() {
     // update all buttons with data-wish attribute
     document.querySelectorAll('[data-wish-carid]').forEach(btn => {
         const id = btn.getAttribute('data-wish-carid');
-        if (userWishlist.has(id)) {
-            btn.textContent = 'In My Wishlist ✓';
-            btn.classList.add('in-wishlist');
-        } else {
-            btn.textContent = 'Add to my Wishlist';
+        if (!isAuthenticated) {
+            // Guest: disable wishlist actions and show prompt text
+            btn.disabled = true;
+            btn.title = 'Sign in to add items to your wishlist';
+            btn.textContent = 'Sign in to Wishlist';
             btn.classList.remove('in-wishlist');
+        } else {
+            btn.disabled = false;
+            btn.title = '';
+            if (userWishlist.has(id)) {
+                btn.textContent = 'In My Wishlist ✓';
+                btn.classList.add('in-wishlist');
+            } else {
+                btn.textContent = 'Add to my Wishlist';
+                btn.classList.remove('in-wishlist');
+            }
         }
     });
 }
