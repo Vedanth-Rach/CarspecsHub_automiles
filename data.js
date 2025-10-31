@@ -1679,7 +1679,7 @@ const indianCarsData = [
           features: ['7 Airbags', 'ABS with EBD', 'Traction Control', 'Adaptive Cruise Control', 'Automatic Emergency Braking', '360 Camera']
         },
         colors: ['Parkour Red', 'Ski White', 'Boulder Grey', 'Forest Green'],
-        image: 'https://imgd.aeplcdn.com/1056x594/n/cw/ec/112613/atto-3-exterior-right-front-three-quarter-3.jpeg?isig=0&q=80'
+				image: 'https://media.assettype.com/thequint%2F2022-10%2F6b00ebd6-81d7-48ce-acba-07b553aa5df7%2Fcomposit.jpg?auto=format%2Ccompress&fmt=webp&width=720&w=1200'
       }
     ]
   }
