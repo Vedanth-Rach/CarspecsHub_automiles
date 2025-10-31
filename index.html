@@ -79,7 +79,7 @@
 
                 <div class="meta-links">
                     <div>Don't have an account? <a href="#" id="signUpLink" class="register-link">Sign Up</a></div>
-                    <a href="#" id="skipLink" class="skip-link">Skip and Browse Cars →</a>
+                    <a href="dashboard.html" id="skipLink" class="skip-link">Skip and Browse Cars →</a>
                 </div>
 
             </div>
@@ -213,51 +213,7 @@
             }
         })();
 
-        // (Warning-related UI changes removed) — server-side error flag handling reverted.
-        // Skip link behavior: show modal asking to log in or continue as guest
-        (function() {
-            const skipLink = document.getElementById('skipLink');
-            const skipModal = document.getElementById('skipModal');
-            const skipCancelBtn = document.getElementById('skipCancelBtn');
-            const skipGuestBtn = document.getElementById('skipGuestBtn');
-            const skipLoginBtn = document.getElementById('skipLoginBtn');
-            const emailInput = document.getElementById('email');
-
-            if (!skipLink || !skipModal) return;
-
-            function openSkipModal() {
-                skipModal.style.display = 'flex';
-                skipModal.setAttribute('aria-hidden', 'false');
-            }
-            function closeSkipModal() {
-                skipModal.style.display = 'none';
-                skipModal.setAttribute('aria-hidden', 'true');
-            }
-
-            skipLink.addEventListener('click', function(e) {
-                e.preventDefault();
-                openSkipModal();
-            });
-
-            skipCancelBtn && skipCancelBtn.addEventListener('click', function() {
-                closeSkipModal();
-            });
-
-            skipGuestBtn && skipGuestBtn.addEventListener('click', function() {
-                // Continue to dashboard as guest
-                window.location.href = 'dashboard.html';
-            });
-
-            skipLoginBtn && skipLoginBtn.addEventListener('click', function() {
-                // Close modal and focus the login form so the user can sign in
-                closeSkipModal();
-                if (emailInput) {
-                    emailInput.focus();
-                    // Optionally scroll to top where the form is
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                }
-            });
-        })();
+        // Skip link now points directly to the dashboard (guest browse). No JS modal required.
     </script>
         
 </body>

@@ -190,7 +190,8 @@ function toggleWishlist(carId, btn) {
                 updateWishlistButtons();
                 showCustomMessage('Added to your wishlist', 'info');
             } else if (r.status === 401) {
-                showCustomMessage('Please sign in to add to your wishlist.', 'error');
+                // Not authenticated — prompt the user to sign in
+                promptLogin('Please sign in to add items to your wishlist.');
             } else {
                 showCustomMessage('Could not add to wishlist', 'error');
             }
@@ -1824,4 +1825,42 @@ function showCustomMessage(message, type = 'info') {
     
     textElement.textContent = message;
     modal.classList.add('show');
+}
+
+// Prompt user to login when an action requires authentication.
+function promptLogin(message) {
+    // Create a modal with two actions: Sign In (redirect to login) or Cancel
+    const id = 'loginPromptModal';
+    let el = document.getElementById(id);
+    if (!el) {
+        el = document.createElement('div');
+        el.id = id;
+        el.className = 'modal';
+        el.innerHTML = `
+            <div class="modal-content" style="max-width:420px; text-align:center;">
+                <div class="modal-header">
+                    <h2 style="font-size:1.2rem;">Sign in required</h2>
+                    <button id="closeLoginPrompt" class="close-btn"><i class="fas fa-times"></i></button>
+                </div>
+                <div style="padding:1.25rem;">
+                    <p id="loginPromptText" style="margin-bottom:1rem;"></p>
+                    <div style="display:flex; gap:0.5rem; justify-content:center;">
+                        <button id="loginPromptSignin" style="padding:0.6rem 1rem; background:#2563eb; color:white; border:none; border-radius:6px;">Sign in</button>
+                        <button id="loginPromptCancel" style="padding:0.6rem 1rem; background:#e5e7eb; color:#111827; border:none; border-radius:6px;">Cancel</button>
+                    </div>
+                </div>
+            </div>`;
+        document.body.appendChild(el);
+
+        document.getElementById('closeLoginPrompt').addEventListener('click', () => el.classList.remove('show'));
+        document.getElementById('loginPromptCancel').addEventListener('click', () => el.classList.remove('show'));
+        document.getElementById('loginPromptSignin').addEventListener('click', () => {
+            // Redirect to login page
+            window.location.href = '/';
+        });
+    }
+
+    const text = document.getElementById('loginPromptText');
+    if (text) text.textContent = message || 'You must sign in to perform this action.';
+    el.classList.add('show');
 }
