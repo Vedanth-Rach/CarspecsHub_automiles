@@ -1,7 +1,12 @@
 require('dotenv').config();
 const { MongoClient } = require('mongodb');
 const uri = process.env.MONGODB_URI;
-const email = process.argv[2] || 'testuser@example.com';
+const email = process.argv[2];
+
+if (!email) {
+  console.error('Usage: node check_user.js <email>');
+  process.exit(2);
+}
 
 if (!uri) {
   console.error('MONGODB_URI not set in .env');

@@ -55,11 +55,13 @@ const userSchema = new mongoose.Schema({
 
 const User = mongoose.model('User', userSchema);
 
-// --- TEMPORARY IN-MEMORY CREDENTIALS FOR TESTING THE REDIRECT ---
-// **REPLACE THIS WITH REAL MONGODB LOGIC LATER**
+// --- OPTIONAL IN-MEMORY CREDENTIALS FOR LOCAL TESTING ---
+// Note: By default this is disabled. If you want a mock login for
+// local development, set MOCK_USER_EMAIL and MOCK_USER_PASSWORD in your
+// environment. This avoids shipping hardcoded credentials in the repo.
 const MOCK_USER = {
-    username: 'testuser@example.com',
-    password: 'password123' // You should use hashed passwords in a real app
+    username: process.env.MOCK_USER_EMAIL || null,
+    password: process.env.MOCK_USER_PASSWORD || null
 };
 
 // 1. ROUTE TO SERVE THE LOGIN PAGE (Your new index.html)
@@ -132,7 +134,9 @@ app.get('/dashboard.html', (req, res) => {
 // Start the server
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
-    console.log('Use testuser@example.com / password123 to log in.');
+    if (MOCK_USER.username && MOCK_USER.password) {
+        console.log('Mock login is ENABLED for local development. Set MOCK_USER_EMAIL/MOCK_USER_PASSWORD to change.');
+    }
 });
 
 // ---------- NEW: Registration endpoint ----------
