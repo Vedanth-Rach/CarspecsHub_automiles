@@ -139,18 +139,37 @@
 
                     fetch(loginForm.action || '/login', {
                         method: loginForm.method || 'POST',
-                        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                            'Accept': 'application/json'
+                        },
                         body: new URLSearchParams(formData).toString()
-                    }).then(resp => {
+                    }).then(async resp => {
+                        // If the server redirected (browser form behavior), follow it
                         if (resp.redirected) {
                             window.location.href = resp.url;
                             return;
                         }
+
                         if (resp.ok) {
                             window.location.href = 'dashboard.html';
-                        } else {
-                            return resp.text().then(t => showMessage(t || 'Login failed: Invalid credentials.', 'error'));
+                            return;
                         }
+
+                        // Try to parse JSON error message first
+                        try {
+                            const json = await resp.json();
+                            if (json && json.error) {
+                                showMessage(json.error || 'Invalid credentials', 'error');
+                                return;
+                            }
+                        } catch (e) {
+                            // ignore JSON parse errors
+                        }
+
+                        // Fallback to text
+                        const text = await resp.text().catch(() => 'Login failed: Invalid credentials.');
+                        showMessage(text || 'Login failed: Invalid credentials.', 'error');
                     }).catch(err => {
                         console.warn('Login fetch failed, falling back to client-side redirect:', err);
                         window.location.href = 'dashboard.html';

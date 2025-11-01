@@ -86,6 +86,9 @@ app.post('/login', (req, res) => {
 
     console.log(`Attempting login for: ${identifier}`);
 
+    // Determine if client expects JSON (fetch requests set Accept: application/json)
+    const acceptsJSON = req.headers.accept && req.headers.accept.includes('application/json');
+
     // If MongoDB is connected, use it; otherwise fall back to MOCK_USER
     (async () => {
         try {
@@ -94,6 +97,7 @@ app.post('/login', (req, res) => {
                 const user = await User.findOne({ email: identifier }).exec();
                 if (!user) {
                     console.log('User not found in DB');
+                    if (acceptsJSON) return res.status(401).json({ error: 'Invalid credentials' });
                     return res.redirect('/?error=1');
                 }
 
@@ -106,6 +110,7 @@ app.post('/login', (req, res) => {
                     return res.redirect('/dashboard.html');
                 } else {
                     console.log('Invalid credentials (DB)');
+                    if (acceptsJSON) return res.status(401).json({ error: 'Invalid credentials' });
                     return res.redirect('/?error=1');
                 }
             }
@@ -120,6 +125,7 @@ app.post('/login', (req, res) => {
             }
 
             console.log('Login failed. Redirecting back to index with error flag.');
+            if (acceptsJSON) return res.status(401).json({ error: 'Invalid credentials' });
             return res.redirect('/?error=1');
         } catch (err) {
             console.error('Login error:', err.message);
