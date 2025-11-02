@@ -2,6 +2,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const path = require('path');
+const cors = require('cors');
 // Load .env early so MONGODB_URI is available to mongoose
 try { require('dotenv').config(); } catch (e) { /* dotenv optional */ }
 const mongoose = require('mongoose');
@@ -22,6 +23,13 @@ app.use((req, res, next) => {
 // Serve the directory normally (allow index.html to be served by default).
 app.use(express.static(path.join(__dirname, '/')));
 
+// If FRONTEND_URL is provided (the frontend is deployed separately), enable
+// CORS for that origin and allow credentials for cookie-based sessions.
+if (process.env.FRONTEND_URL) {
+    app.use(cors({ origin: process.env.FRONTEND_URL, credentials: true }));
+    console.log('CORS enabled for frontend:', process.env.FRONTEND_URL);
+}
+
 // Middleware to parse form data (required for req.body.username)
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -31,7 +39,12 @@ app.use(session({
     secret: process.env.SESSION_SECRET || 'dev-secret-session',
     resave: false,
     saveUninitialized: false,
-    cookie: { maxAge: 7 * 24 * 60 * 60 * 1000 } // 7 days
+    cookie: {
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+        // In production, allow cross-site cookies if frontend is separate
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+        secure: process.env.NODE_ENV === 'production'
+    }
 }));
 
 // --- MONGODB CONNECTION SETUP ---

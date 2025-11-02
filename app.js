@@ -58,6 +58,10 @@ const wishlistSection = document.getElementById('wishlistSection');
 const tabHome = document.getElementById('tabHome');
 const tabWishlist = document.getElementById('tabWishlist');
 
+// Runtime API base (set by config.js at deploy time). When frontend and backend
+// are deployed to separate origins, set window.API_BASE to the backend URL.
+const API_BASE = (window && window.API_BASE) ? window.API_BASE.replace(/\/$/, '') : '';
+
 // Wishlist state for the current logged-in user
 let userWishlist = new Set(); // set of carIds
 // Track whether the current visitor is authenticated (server session)
@@ -65,7 +69,7 @@ let isAuthenticated = false;
 
 // Load wishlist from server (if authenticated). Populates userWishlist set.
 function loadWishlist() {
-    fetch('/api/wishlist', { credentials: 'same-origin' })
+    fetch(`${API_BASE}/api/wishlist`, { credentials: 'include' })
         .then(resp => {
             if (resp.status === 401) {
                 // Not authenticated; mark state and update UI
@@ -93,7 +97,7 @@ function renderWishlistView() {
     if (!wishlistSection) return;
     wishlistSection.innerHTML = `<div class="card"><div class="card-header"><h3 class="card-title">Your Wishlist</h3></div><div class="card-body"><p>Loading your wishlist...</p></div></div>`;
 
-    fetch('/api/wishlist', { credentials: 'same-origin' })
+    fetch(`${API_BASE}/api/wishlist`, { credentials: 'include' })
         .then(resp => {
             if (resp.status === 401) {
                 // Not authenticated
@@ -176,7 +180,7 @@ function toggleWishlist(carId, btn) {
     const inList = userWishlist.has(carId);
     if (inList) {
         // remove
-        fetch(`/api/wishlist/${encodeURIComponent(carId)}`, {
+        fetch(`${API_BASE}/api/wishlist/${encodeURIComponent(carId)}`, {
             method: 'DELETE', credentials: 'same-origin'
         }).then(r => {
             if (r.ok) {
@@ -195,8 +199,8 @@ function toggleWishlist(carId, btn) {
         });
     } else {
         // add
-        fetch('/api/wishlist', {
-            method: 'POST', credentials: 'same-origin',
+        fetch(`${API_BASE}/api/wishlist`, {
+            method: 'POST', credentials: 'include',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
             body: new URLSearchParams({ carId })
         }).then(r => {

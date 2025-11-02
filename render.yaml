@@ -1,9 +1,17 @@
 services:
   - type: web
-    name: CarspecsHub-web
+    name: cars-api
     env: node
     branch: main
     buildCommand: "npm install"
     startCommand: "npm start"
+    plan: free
+    autoDeploy: true
+
+  - type: static
+    name: cars-frontend
+    branch: main
+    buildCommand: ""
+    publishPath: .
     plan: free
     autoDeploy: true

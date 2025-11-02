@@ -8,6 +8,8 @@
     <link rel="stylesheet" href="styles.css"> 
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <!-- Page-specific styling is in styles.css -->
+    <!-- Runtime config for API base (create/override config.js in deployment) -->
+    <script src="/config.js"></script>
 </head>
 <body>
     <div class="hero">
@@ -137,7 +139,8 @@
                     e.preventDefault();
                     const formData = new FormData(loginForm);
 
-                    fetch(loginForm.action || '/login', {
+                    const loginUrl = (window && window.API_BASE) ? window.API_BASE.replace(/\/$/, '') + '/login' : (loginForm.action || '/login');
+                    fetch(loginUrl, {
                         method: loginForm.method || 'POST',
                         headers: {
                             'Content-Type': 'application/x-www-form-urlencoded',
@@ -152,7 +155,8 @@
                         }
 
                         if (resp.ok) {
-                            window.location.href = 'dashboard.html';
+                            // If backend responded OK then redirect to the dashboard on the frontend
+                            window.location.href = (window && window.API_BASE) ? window.API_BASE.replace(/\/$/, '') + '/dashboard.html' : 'dashboard.html';
                             return;
                         }
 
