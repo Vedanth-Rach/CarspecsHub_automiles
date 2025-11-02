@@ -170,13 +170,21 @@ function updateWishlistButtons() {
             } else {
             btn.disabled = false;
             btn.title = '';
-            if (userWishlist.has(id)) {
-                btn.textContent = 'In My Wishlist ✓';
-                btn.classList.add('in-wishlist');
-            } else {
-                btn.textContent = 'Add to my Wishlist';
-                btn.classList.remove('in-wishlist');
-            }
+                    // If this button lives inside the wishlist view, it should act as
+                    // a remove button (so users can remove items directly from their
+                    // wishlist). Otherwise, show Add/In Wishlist states.
+                    if (btn.closest && btn.closest('.wishlist-list')) {
+                        btn.textContent = 'Remove from wishlist';
+                        btn.classList.remove('in-wishlist');
+                    } else {
+                        if (userWishlist.has(id)) {
+                            btn.textContent = 'In My Wishlist ✓';
+                            btn.classList.add('in-wishlist');
+                        } else {
+                            btn.textContent = 'Add to my Wishlist';
+                            btn.classList.remove('in-wishlist');
+                        }
+                    }
         }
     });
 }
