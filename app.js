@@ -151,40 +151,39 @@ function updateWishlistButtons() {
     document.querySelectorAll('[data-wish-carid]').forEach(btn => {
         const id = btn.getAttribute('data-wish-carid');
         if (!isAuthenticated) {
-                // Guest: disable wishlist actions. For buttons rendered inside the
-                // wishlist view we show a "Remove from wishlist" label (disabled)
-                // so the UI matches the design where items in the list can be
-                // removed when signed in. For buttons elsewhere (model list /
-                // details) show the Add label but keep them disabled.
-                btn.disabled = true;
-                // If this button is inside the wishlist list, show "Remove from wishlist"
-                // (keeps the red/clear button affordance visible but disabled).
-                if (btn.closest && btn.closest('.wishlist-list')) {
-                    btn.title = 'Sign in to remove items from your wishlist';
-                    btn.textContent = 'Remove from wishlist';
-                } else {
-                    btn.title = 'Sign in to add items to your wishlist';
-                    btn.textContent = 'Add to my Wishlist';
-                }
-                btn.classList.remove('in-wishlist');
-            } else {
+            // Guest: do not perform add/remove actions. Instead attach a
+            // handler that prompts the user to sign in. Keep the button
+            // visually enabled so it's discoverable, but clicking it opens
+            // the sign-in prompt.
+            btn.disabled = false;
+            btn.title = 'Sign in to manage your wishlist';
+            // Use a friendly label for guests
+            btn.textContent = 'Sign in to Wishlist';
+            btn.classList.remove('in-wishlist');
+            // Remove any previous onclick that might call toggleWishlist and
+            // replace with a promptLogin call.
+            btn.onclick = function (e) { e && e.stopPropagation(); promptLogin('Please sign in to manage your wishlist.'); };
+        } else {
+            // Authenticated: restore the real wishlist action handler and
+            // update label to reflect current state. Buttons inside the
+            // wishlist view are remove buttons; elsewhere they show add/in
             btn.disabled = false;
             btn.title = '';
-                    // If this button lives inside the wishlist view, it should act as
-                    // a remove button (so users can remove items directly from their
-                    // wishlist). Otherwise, show Add/In Wishlist states.
-                    if (btn.closest && btn.closest('.wishlist-list')) {
-                        btn.textContent = 'Remove from wishlist';
-                        btn.classList.remove('in-wishlist');
-                    } else {
-                        if (userWishlist.has(id)) {
-                            btn.textContent = 'In My Wishlist ✓';
-                            btn.classList.add('in-wishlist');
-                        } else {
-                            btn.textContent = 'Add to my Wishlist';
-                            btn.classList.remove('in-wishlist');
-                        }
-                    }
+            // attach the real handler which calls toggleWishlist
+            btn.onclick = function (e) { e && e.stopPropagation(); toggleWishlist(id, btn); };
+
+            if (btn.closest && btn.closest('.wishlist-list')) {
+                btn.textContent = 'Remove from wishlist';
+                btn.classList.remove('in-wishlist');
+            } else {
+                if (userWishlist.has(id)) {
+                    btn.textContent = 'In My Wishlist ✓';
+                    btn.classList.add('in-wishlist');
+                } else {
+                    btn.textContent = 'Add to my Wishlist';
+                    btn.classList.remove('in-wishlist');
+                }
+            }
         }
     });
 }
