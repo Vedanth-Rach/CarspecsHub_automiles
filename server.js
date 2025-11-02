@@ -62,6 +62,21 @@ if (MONGODB_URI) {
     console.warn('MONGODB_URI is not set — skipping MongoDB connection. App will run in mock/no-DB mode.');
 }
 
+// Log mongoose connection state changes to help diagnose deployment issues
+mongoose.connection.on('connected', () => console.log('Mongoose event: connected'));
+mongoose.connection.on('error', (err) => console.error('Mongoose event: error', err && err.message));
+mongoose.connection.on('disconnected', () => console.log('Mongoose event: disconnected'));
+
+// Temporary debug endpoint to inspect DB connection state in deployment
+app.get('/_debug_db', (req, res) => {
+    try {
+        const state = mongoose.connection.readyState; // 0 = disconnected, 1 = connected, 2 = connecting, 3 = disconnecting
+        return res.json({ ok: true, mongoReadyState: state, mongoUriProvided: !!MONGODB_URI });
+    } catch (err) {
+        return res.status(500).json({ ok: false, error: err.message });
+    }
+});
+
 // Define a simple User Schema for MongoDB
 const userSchema = new mongoose.Schema({
     email: { type: String, required: true, unique: true, lowercase: true, trim: true },
