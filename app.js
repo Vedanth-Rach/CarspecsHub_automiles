@@ -151,12 +151,23 @@ function updateWishlistButtons() {
     document.querySelectorAll('[data-wish-carid]').forEach(btn => {
         const id = btn.getAttribute('data-wish-carid');
         if (!isAuthenticated) {
-            // Guest: disable wishlist actions and show prompt text
-            btn.disabled = true;
-            btn.title = 'Sign in to add items to your wishlist';
-            btn.textContent = 'Sign in to Wishlist';
-            btn.classList.remove('in-wishlist');
-        } else {
+                // Guest: disable wishlist actions. For buttons rendered inside the
+                // wishlist view we show a "Remove from wishlist" label (disabled)
+                // so the UI matches the design where items in the list can be
+                // removed when signed in. For buttons elsewhere (model list /
+                // details) show the Add label but keep them disabled.
+                btn.disabled = true;
+                // If this button is inside the wishlist list, show "Remove from wishlist"
+                // (keeps the red/clear button affordance visible but disabled).
+                if (btn.closest && btn.closest('.wishlist-list')) {
+                    btn.title = 'Sign in to remove items from your wishlist';
+                    btn.textContent = 'Remove from wishlist';
+                } else {
+                    btn.title = 'Sign in to add items to your wishlist';
+                    btn.textContent = 'Add to my Wishlist';
+                }
+                btn.classList.remove('in-wishlist');
+            } else {
             btn.disabled = false;
             btn.title = '';
             if (userWishlist.has(id)) {
@@ -181,8 +192,33 @@ function toggleWishlist(carId, btn) {
         }).then(r => {
             if (r.ok) {
                 userWishlist.delete(carId);
-                if (btn) btn.textContent = 'Add to my Wishlist';
+                // If we're rendering inside the wishlist view, remove the
+                // surrounding item element from the DOM for immediate feedback.
+                if (btn) {
+                    // If the button is the Remove button inside the wishlist list,
+                    // its closest .wishlist-item container should be removed.
+                    const wishlistItem = btn.closest && btn.closest('.wishlist-item');
+                    if (wishlistItem && wishlistItem.parentNode) {
+                        wishlistItem.parentNode.removeChild(wishlistItem);
+                    } else {
+                        // Fallback: update button label
+                        btn.textContent = 'Add to my Wishlist';
+                    }
+                }
+
+                // Update other wishlist UI (buttons across the site)
                 updateWishlistButtons();
+
+                // If the user is currently viewing the wishlist, re-check if any
+                // items remain; if none, show the empty state.
+                if (currentView === 'WISHLIST') {
+                    // If the wishlist list DOM is now empty, render empty message
+                    const listContainer = document.querySelector('.wishlist-list');
+                    if (!listContainer || listContainer.children.length === 0) {
+                        wishlistSection.innerHTML = `<div class="card"><div class="card-header"><h3 class="card-title">Your Wishlist</h3></div><div class="card-body"><p>Your wishlist is empty. Browse models and add ones you like.</p></div></div>`;
+                    }
+                }
+
                 showCustomMessage('Removed from your wishlist', 'info');
             } else if (r.status === 401) {
                 showCustomMessage('Please sign in to manage your wishlist.', 'error');
