@@ -66,28 +66,31 @@
 					<button id="tabWishlist" class="tab-btn">Wishlist</button>
 				</nav>
 
-				<button id="logoutBtn" class="budget-btn logout-btn">
-					<i class="fas fa-sign-out-alt"></i>
-					Log Out
-				</button>
+				<!-- Right-aligned header actions: compare, budget, sign in (guest), logout -->
+				<div class="header-actions">
+					<!-- Global Compare Button (Always visible in the header) -->
+					<button id="compareBtnGlobal" class="compare-btn">
+						<i class="fas fa-exchange-alt"></i>
+						Compare All Models
+					</button>
 
-				<!-- Shown for guests who used Skip and Browse; hidden by default and
-				     toggled by client-side session check in app.js -->
-				<button id="signinBtn" class="budget-btn signin-btn" style="display:none;">
-					<i class="fas fa-sign-in-alt"></i>
-					Sign In
-				</button>
+					<button id="budgetBtn" class="budget-btn">
+						<i class="fas fa-calculator"></i>
+						Budget Finder
+					</button>
 
-				<!-- Global Compare Button (Always visible in the header) -->
-				<button id="compareBtnGlobal" class="compare-btn">
-					<i class="fas fa-exchange-alt"></i>
-					Compare All Models
-				</button>
-				
-				<button id="budgetBtn" class="budget-btn">
-					<i class="fas fa-calculator"></i>
-					Budget Finder
-				</button>
+					<!-- Shown for guests who used Skip and Browse; hidden by default and
+						 toggled by client-side session check in app.js -->
+					<button id="signinBtn" class="budget-btn signin-btn">
+						<i class="fas fa-sign-in-alt"></i>
+						Sign In
+					</button>
+
+					<button id="logoutBtn" class="budget-btn logout-btn">
+						<i class="fas fa-sign-out-alt"></i>
+						Log Out
+					</button>
+				</div>
 			</div>
 		</div>
 	</header>

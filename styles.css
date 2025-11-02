@@ -42,6 +42,19 @@ body {
     height: 4rem;
 }
 
+/* Right-aligned header actions container (compare, budget, sign-in, logout) */
+.header-actions {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Sign-in shown for guests via client-side JS; hide by default in CSS */
+.signin-btn {
+    display: none;
+}
+
 .logo-section {
     display: flex;
     align-items: center;

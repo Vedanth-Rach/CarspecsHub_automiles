@@ -158,7 +158,7 @@ function updateWishlistButtons() {
             btn.disabled = false;
             btn.title = 'Sign in to manage your wishlist';
             // Use a friendly label for guests
-            btn.textContent = 'Sign in to Wishlist';
+            btn.textContent = 'Sign in to add in wishlist';
             btn.classList.remove('in-wishlist');
             // Remove any previous onclick that might call toggleWishlist and
             // replace with a promptLogin call.
@@ -191,6 +191,12 @@ function updateWishlistButtons() {
 // Toggle wishlist state for a car. `btn` is the button element (optional)
 function toggleWishlist(carId, btn) {
     if (!carId) return;
+    // If the visitor is not authenticated (e.g., they used "Skip and Browse"),
+    // prevent wishlist mutations and prompt them to sign in first.
+    if (!isAuthenticated) {
+        promptLogin('Please sign in to manage your wishlist.');
+        return;
+    }
     const inList = userWishlist.has(carId);
     if (inList) {
         // remove
@@ -794,6 +800,12 @@ function renderContent() {
             tabWishlist.classList.toggle('active', currentView === 'WISHLIST');
             tabWishlist.setAttribute('aria-pressed', currentView === 'WISHLIST');
         }
+    } catch (e) { /* ignore */ }
+
+    // Ensure wishlist buttons reflect the current authentication state
+    // after rendering content so guest users cannot add/remove wishlist items.
+    try {
+        updateWishlistButtons();
     } catch (e) { /* ignore */ }
 }
 
