@@ -334,26 +334,37 @@ document.addEventListener('DOMContentLoaded', function() {
                 .then(r => r.json())
                 .then(json => {
                     const logoutBtn = document.getElementById('logoutBtn');
+                    const signinBtn = document.getElementById('signinBtn');
                     if (!json || !json.authenticated) {
-                        // Hide the Log Out button for guests
+                        // Hide the Log Out button for guests and show Sign In
                         if (logoutBtn) logoutBtn.style.display = 'none';
+                        if (signinBtn) signinBtn.style.display = '';
                         isAuthenticated = false;
                     } else {
                         if (logoutBtn) logoutBtn.style.display = '';
+                        if (signinBtn) signinBtn.style.display = 'none';
                         isAuthenticated = true;
+                    }
+                    // Add click handler to Sign In button (redirect to login)
+                    if (signinBtn) {
+                        signinBtn.addEventListener('click', function () { window.location.href = '/'; });
                     }
                     // Update wishlist buttons once we know auth state
                     updateWishlistButtons();
                 }).catch(err => {
                     // On error, assume guest and hide logout
                     const logoutBtn = document.getElementById('logoutBtn');
+                    const signinBtn = document.getElementById('signinBtn');
                     if (logoutBtn) logoutBtn.style.display = 'none';
+                    if (signinBtn) signinBtn.style.display = '';
                     isAuthenticated = false;
                     updateWishlistButtons();
                 });
         } catch (err) {
             const logoutBtn = document.getElementById('logoutBtn');
+            const signinBtn = document.getElementById('signinBtn');
             if (logoutBtn) logoutBtn.style.display = 'none';
+            if (signinBtn) signinBtn.style.display = '';
             isAuthenticated = false;
             updateWishlistButtons();
         }
