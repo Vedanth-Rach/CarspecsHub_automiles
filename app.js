@@ -326,6 +326,38 @@ document.addEventListener('DOMContentLoaded', function() {
         // Re-enable pushing to the browser history for subsequent navigation
         suppressPushToBrowser = false;
     }
+
+    // Check authentication status (so guests who skipped browsing don't see Log Out)
+    (function checkSession() {
+        try {
+            fetch('/api/session', { credentials: 'same-origin' })
+                .then(r => r.json())
+                .then(json => {
+                    const logoutBtn = document.getElementById('logoutBtn');
+                    if (!json || !json.authenticated) {
+                        // Hide the Log Out button for guests
+                        if (logoutBtn) logoutBtn.style.display = 'none';
+                        isAuthenticated = false;
+                    } else {
+                        if (logoutBtn) logoutBtn.style.display = '';
+                        isAuthenticated = true;
+                    }
+                    // Update wishlist buttons once we know auth state
+                    updateWishlistButtons();
+                }).catch(err => {
+                    // On error, assume guest and hide logout
+                    const logoutBtn = document.getElementById('logoutBtn');
+                    if (logoutBtn) logoutBtn.style.display = 'none';
+                    isAuthenticated = false;
+                    updateWishlistButtons();
+                });
+        } catch (err) {
+            const logoutBtn = document.getElementById('logoutBtn');
+            if (logoutBtn) logoutBtn.style.display = 'none';
+            isAuthenticated = false;
+            updateWishlistButtons();
+        }
+    })();
 });
 
 // Handle user pressing the browser Back/Forward buttons

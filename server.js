@@ -213,6 +213,14 @@ app.get('/api/wishlist', requireAuth, async (req, res) => {
     }
 });
 
+// Simple session check for the frontend to know if the visitor is authenticated.
+app.get('/api/session', (req, res) => {
+    if (req.session && req.session.userId) {
+        return res.json({ authenticated: true, email: req.session.email || null });
+    }
+    return res.json({ authenticated: false });
+});
+
 // Add car to wishlist
 app.post('/api/wishlist', requireAuth, bodyParser.urlencoded({ extended: true }), async (req, res) => {
     try {
