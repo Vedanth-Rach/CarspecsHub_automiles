@@ -1698,6 +1698,28 @@ body {
     overflow: hidden;
 }
 
+/* Header specific to the login page: full-width, fixed at top */
+.auth-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 72px;
+    background: white;
+    border-bottom: 1px solid #e5e7eb;
+    display: flex;
+    align-items: center;
+    z-index: 1100;
+    box-shadow: 0 2px 8px rgba(2,6,23,0.06);
+}
+.auth-header .header-inner {
+    display: flex;
+    align-items: center;
+}
+
+/* Push page content below the fixed header */
+body { padding-top: 72px; }
+
 .auth-wrapper {
     position: relative;
     width: 100%;
@@ -1730,6 +1752,7 @@ body {
     gap: 0.75rem;
     min-width: 260px;
     justify-content: center;
+    z-index: 1150; /* ensure pill sits above fixed header */
 }
 
 .logo-pill .logo-icon {
